@@ -368,24 +368,32 @@
             checkSavedSession();
         });
 
-        // تشغيل صوت التنبيه (Beep Sound) عند اكتمال البحث بنجاح
+        // تشغيل صوت تنبيه مضمون (مبني بلغة الموجات الصوتية داخل المتصفح وبدون ملفات خارجية)
         function playSuccessBeep() {
             try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
                 
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // تردد النغمة
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + 0.15); // مدة النغمة
+                // حل مشكلة قفل المتصفح للصوت عبر تفعيل السياق إن كان معطلاً
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(950, ctx.currentTime); // تردد نغمة عالية واضحة
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc.stop(ctx.currentTime + 0.2); // مدة التنبيه 200 ميلي ثانية
             } catch (e) {
-                console.log("Audio not supported or blocked", e);
+                console.log("Audio play error:", e);
             }
         }
 
@@ -416,10 +424,11 @@
                         // عند قراءة الباركود بنجاح عبر الكاميرا
                         document.getElementById('stock-search-input').value = decodedText;
                         toggleScanner(); // إغلاق الكاميرا تلقائياً
+                        playSuccessBeep(); // إصدار صوت التنبيه فور القراءة الناجحة
                         fetchStockData(); // تنفيذ البحث فوراً
                     },
                     (errorMessage) => {
-                        // أخطاء المسح المؤقتة نتجاهلها لكي تستمر الكاميرا في المحاولة
+                        // أخطاء المسح المؤقتة نتجاهلها
                     }
                 ).then(() => {
                     isScannerRunning = true;
@@ -498,7 +507,7 @@
 
         function navigateTo(viewName) {
             if (isScannerRunning && viewName !== 'stock') {
-                toggleScanner(); // إغلاق الكاميرا إذا انتقل المستخدم لصفحة أخرى
+                toggleScanner();
             }
 
             const views = ['dashboard', 'branch-ops', 'stock', 'sales', 'transfers', 'requests'];
@@ -753,7 +762,7 @@
                         container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد أرصدة متاحة (الرصيد صفر في جميع الفروع).</p>';
                     }
 
-                    // تشغيل صوت التنبيه فور نجاح البحث
+                    // تشغيل صوت التنبيه فور جلب تفاصيل المنتج بنجاح
                     playSuccessBeep();
 
                 } else {
@@ -825,7 +834,7 @@
             fetchStockData();
         }
 
-        // 2. شاشة المبيعات التفاعلية مع إرسال كود الفرع المستخرج من الإيميل تلقائياً
+        // 2. شاشة المبيعات التفاعلية
         async function fetchSalesData() {
             const totalContainer = document.getElementById('sales-total-val');
             const countContainer = document.getElementById('sales-count-val');
