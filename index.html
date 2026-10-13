@@ -130,7 +130,7 @@
                     <span class="text-slate-500 font-bold">طريقة البحث / Search Method:</span>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="search_type" value="item" checked onchange="updateSearchPlaceholder()" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
-                        <span>رقم المنتج (Item Code / Barcode)</span>
+                        <span>رقم المنتج أو الـ UPC / Item Code or UPC</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="search_type" value="model" onchange="updateSearchPlaceholder()" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
@@ -140,7 +140,7 @@
 
                 <!-- شريط البحث مع زر الكاميرا -->
                 <div class="flex gap-2 flex-wrap sm:flex-nowrap">
-                    <input type="text" id="stock-search-input" onkeypress="handleKeyPress(event)" placeholder="أدخل كود المنتج Item Code أو الباركود..." class="flex-grow border border-slate-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="stock-search-input" onkeypress="handleKeyPress(event)" placeholder="أدخل كود المنتج، الباركود، أو رقم الـ UPC..." class="flex-grow border border-slate-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <button onclick="toggleScanner()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-emerald-700 transition flex items-center gap-2 shrink-0">
                         <i class="fa-solid fa-camera"></i> مسح بالكاميرا
                     </button>
@@ -152,7 +152,7 @@
                 <!-- حاوية كاميرا مسح الباركود -->
                 <div id="scanner-container-box" class="hidden bg-slate-900 p-4 rounded-2xl border border-slate-700 text-center space-y-3">
                     <div class="flex justify-between items-center text-white px-2">
-                        <span class="text-xs font-bold"><i class="fa-solid fa-camera text-emerald-400"></i> قم بتوجيه الكاميرا نحو باركود المنتج</span>
+                        <span class="text-xs font-bold"><i class="fa-solid fa-camera text-emerald-400"></i> قم بتوجيه الكاميرا نحو باركود المنتج أو UPC</span>
                         <button onclick="toggleScanner()" class="text-red-400 hover:text-red-300 text-xs font-bold"><i class="fa-solid fa-xmark"></i> إغلاق الكاميرا</button>
                     </div>
                     <div id="reader" class="w-full max-w-md mx-auto overflow-hidden rounded-xl"></div>
@@ -177,7 +177,7 @@
                 </div>
 
                 <div id="stock-results" class="mt-4 overflow-x-auto">
-                    <p class="text-slate-400 text-sm">أدخل الكود أو امسحه بالكاميرا لعرض تفاصيل المنتج ورصيد الفروع.</p>
+                    <p class="text-slate-400 text-sm">أدخل كود المنتج أو الـ UPC أو امسحه بالكاميرا لعرض تفاصيل المنتج ورصيد الفروع.</p>
                 </div>
             </div>
         </section>
@@ -368,36 +368,31 @@
             checkSavedSession();
         });
 
-        // تشغيل صوت تنبيه مضمون (مبني بلغة الموجات الصوتية داخل المتصفح وبدون ملفات خارجية)
+        // تشغيل صوت تنبيه مضمون
         function playSuccessBeep() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
                 const ctx = new AudioContext();
-                
-                // حل مشكلة قفل المتصفح للصوت عبر تفعيل السياق إن كان معطلاً
-                if (ctx.state === 'suspended') {
-                    ctx.resume();
-                }
+                if (ctx.state === 'suspended') ctx.resume();
 
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
 
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(950, ctx.currentTime); // تردد نغمة عالية واضحة
+                osc.frequency.setValueAtTime(950, ctx.currentTime);
                 gain.gain.setValueAtTime(0.2, ctx.currentTime);
 
                 osc.connect(gain);
                 gain.connect(ctx.destination);
 
                 osc.start();
-                osc.stop(ctx.currentTime + 0.2); // مدة التنبيه 200 ميلي ثانية
+                osc.stop(ctx.currentTime + 0.2);
             } catch (e) {
                 console.log("Audio play error:", e);
             }
         }
 
-        // تحكم في تشغيل وإغلاق كاميرا مسح الباركود
         function toggleScanner() {
             const box = document.getElementById('scanner-container-box');
             
@@ -421,15 +416,12 @@
                     { facingMode: "environment" },
                     { fps: 10, qrbox: { width: 250, height: 150 } },
                     (decodedText) => {
-                        // عند قراءة الباركود بنجاح عبر الكاميرا
                         document.getElementById('stock-search-input').value = decodedText;
-                        toggleScanner(); // إغلاق الكاميرا تلقائياً
-                        playSuccessBeep(); // إصدار صوت التنبيه فور القراءة الناجحة
-                        fetchStockData(); // تنفيذ البحث فوراً
+                        toggleScanner();
+                        playSuccessBeep();
+                        fetchStockData();
                     },
-                    (errorMessage) => {
-                        // أخطاء المسح المؤقتة نتجاهلها
-                    }
+                    (errorMessage) => {}
                 ).then(() => {
                     isScannerRunning = true;
                 }).catch(err => {
@@ -597,7 +589,7 @@
             const searchType = document.querySelector('input[name="search_type"]:checked').value;
             const input = document.getElementById('stock-search-input');
             if (searchType === 'item') {
-                input.placeholder = "أدخل كود المنتج Item Code أو الباركود Barcode...";
+                input.placeholder = "أدخل كود المنتج، الباركود، أو رقم الـ UPC...";
             } else {
                 input.placeholder = "أدخل اسم الموديل Model (مثال: 1065219)...";
             }
@@ -622,7 +614,7 @@
             });
         }
 
-        // 1. فحص المخزون والبحث
+        // 1. فحص المخزون والبحث (محدث للبحث عن طريق Item Code أو UPC)
         async function fetchStockData() {
             const searchValue = document.getElementById('stock-search-input').value.trim();
             const searchType = document.querySelector('input[name="search_type"]:checked').value;
@@ -636,7 +628,7 @@
 
             if (!searchValue) return alert('برجاء إدخال قيمة البحث / Please enter a search value');
 
-            container.innerHTML = '<p class="text-indigo-600 text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري البحث... / Searching...</p>';
+            container.innerHTML = '<p class="text-indigo-600 text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري البحث بالمنتج أو الـ UPC... / Searching...</p>';
             detailsBox.classList.add('hidden');
             infoGrid.innerHTML = '';
             variantsContainer.classList.add('hidden');
@@ -647,6 +639,7 @@
                     let item = null;
                     let realItemCode = searchValue;
 
+                    // المحاولة الأولى: جلب المنتج مباشرة عبر كود الصنف (Item Code)
                     const itemUrl = `${SERVER_URL}/api/resource/Item/${encodeURIComponent(searchValue)}`;
                     const itemRes = await fetchWithAuth(itemUrl);
 
@@ -655,6 +648,7 @@
                         item = itemJson.data;
                         realItemCode = item.name;
                     } else {
+                        // المحاولة الثانية: البحث بالـ item_code عبر الفلتر
                         const searchRes = await fetchWithAuth(`${SERVER_URL}/api/resource/Item?filters=${encodeURIComponent(JSON.stringify([["item_code", "=", searchValue]]))}`);
                         if (searchRes.ok) {
                             const searchJson = await searchRes.json();
@@ -665,8 +659,26 @@
                         }
                     }
 
+                    // المحاولة الثالثة: إذا لم يجد الصنف بالـ Item Code، يبحث برقم الـ UPC في جدول باركودات الأصناف (Item Barcode)
                     if (!item) {
-                        container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لم يتم العثور على الصنف المطلوب.</p>';
+                        const barcodeRes = await fetchWithAuth(`${SERVER_URL}/api/resource/Item Barcode?filters=${encodeURIComponent(JSON.stringify([["barcode", "=", searchValue]]))}`);
+                        if (barcodeRes.ok) {
+                            const barcodeJson = await barcodeRes.json();
+                            if (barcodeJson.data && barcodeJson.data.length > 0) {
+                                const parentItemCode = barcodeJson.data[0].parent;
+                                // جلب بيانات الصنف الأصلي المرتبط بهذا الـ UPC
+                                const parentRes = await fetchWithAuth(`${SERVER_URL}/api/resource/Item/${encodeURIComponent(parentItemCode)}`);
+                                if (parentRes.ok) {
+                                    const parentJson = await parentRes.json();
+                                    item = parentJson.data;
+                                    realItemCode = item.name;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!item) {
+                        container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لم يتم العثور على الصنف المطلوب باستخدام كود المنتج أو الـ UPC.</p>';
                         return;
                     }
 
@@ -762,7 +774,6 @@
                         container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد أرصدة متاحة (الرصيد صفر في جميع الفروع).</p>';
                     }
 
-                    // تشغيل صوت التنبيه فور جلب تفاصيل المنتج بنجاح
                     playSuccessBeep();
 
                 } else {
