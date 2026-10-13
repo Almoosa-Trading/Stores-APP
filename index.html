@@ -10,6 +10,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- مكتبة قراءة الباركود عبر الكاميرا Html5Qrcode -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>body { font-family: 'Cairo', sans-serif; }</style>
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col justify-between">
@@ -136,11 +138,24 @@
                     </label>
                 </div>
 
-                <div class="flex gap-2">
+                <!-- شريط البحث مع زر الكاميرا -->
+                <div class="flex gap-2 flex-wrap sm:flex-nowrap">
                     <input type="text" id="stock-search-input" onkeypress="handleKeyPress(event)" placeholder="أدخل كود المنتج Item Code أو الباركود..." class="flex-grow border border-slate-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <button onclick="fetchStockData()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 transition flex items-center gap-2">
-                        <i class="fa-solid fa-magnifying-glass"></i> بحث / Search
+                    <button onclick="toggleScanner()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-emerald-700 transition flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-camera"></i> مسح بالكاميرا
                     </button>
+                    <button onclick="fetchStockData()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 transition flex items-center gap-2 shrink-0">
+                        <i class="fa-solid fa-magnifying-glass"></i> بحث
+                    </button>
+                </div>
+
+                <!-- حاوية كاميرا مسح الباركود -->
+                <div id="scanner-container-box" class="hidden bg-slate-900 p-4 rounded-2xl border border-slate-700 text-center space-y-3">
+                    <div class="flex justify-between items-center text-white px-2">
+                        <span class="text-xs font-bold"><i class="fa-solid fa-camera text-emerald-400"></i> قم بتوجيه الكاميرا نحو باركود المنتج</span>
+                        <button onclick="toggleScanner()" class="text-red-400 hover:text-red-300 text-xs font-bold"><i class="fa-solid fa-xmark"></i> إغلاق الكاميرا</button>
+                    </div>
+                    <div id="reader" class="w-full max-w-md mx-auto overflow-hidden rounded-xl"></div>
                 </div>
 
                 <div id="stock-details" class="hidden my-4 p-5 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl shadow-lg border border-blue-700/50 space-y-4">
@@ -162,7 +177,7 @@
                 </div>
 
                 <div id="stock-results" class="mt-4 overflow-x-auto">
-                    <p class="text-slate-400 text-sm">أدخل الكود واضغط بحث لعرض تفاصيل المنتج ورصيد الفروع.</p>
+                    <p class="text-slate-400 text-sm">أدخل الكود أو امسحه بالكاميرا لعرض تفاصيل المنتج ورصيد الفروع.</p>
                 </div>
             </div>
         </section>
@@ -336,22 +351,85 @@
 
         let currentAbortController = null;
         let isAuthenticatedUser = false;
+        let html5QrCode = null;
+        let isScannerRunning = false;
 
-       window.addEventListener('DOMContentLoaded', () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    
-    // أول يوم في الشهر الحالي
-    const firstDayOfMonth = `${year}-${month}-01`;
-    // تاريخ اليوم الحالي
-    const today = now.toISOString().split('T')[0];
+        window.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            
+            const firstDayOfMonth = `${year}-${month}-01`;
+            const today = now.toISOString().split('T')[0];
 
-    document.getElementById('sales-from-date').value = firstDayOfMonth;
-    document.getElementById('sales-to-date').value = today;
+            document.getElementById('sales-from-date').value = firstDayOfMonth;
+            document.getElementById('sales-to-date').value = today;
 
-    checkSavedSession();
-});
+            checkSavedSession();
+        });
+
+        // تشغيل صوت التنبيه (Beep Sound) عند اكتمال البحث بنجاح
+        function playSuccessBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // تردد النغمة
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.15); // مدة النغمة
+            } catch (e) {
+                console.log("Audio not supported or blocked", e);
+            }
+        }
+
+        // تحكم في تشغيل وإغلاق كاميرا مسح الباركود
+        function toggleScanner() {
+            const box = document.getElementById('scanner-container-box');
+            
+            if (isScannerRunning) {
+                if (html5QrCode) {
+                    html5QrCode.stop().then(() => {
+                        isScannerRunning = false;
+                        box.classList.add('hidden');
+                    }).catch(err => console.error("Failed to stop scanner", err));
+                } else {
+                    isScannerRunning = false;
+                    box.classList.add('hidden');
+                }
+            } else {
+                box.classList.remove('hidden');
+                if (!html5QrCode) {
+                    html5QrCode = new Html5Qrcode("reader");
+                }
+                
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 150 } },
+                    (decodedText) => {
+                        // عند قراءة الباركود بنجاح عبر الكاميرا
+                        document.getElementById('stock-search-input').value = decodedText;
+                        toggleScanner(); // إغلاق الكاميرا تلقائياً
+                        fetchStockData(); // تنفيذ البحث فوراً
+                    },
+                    (errorMessage) => {
+                        // أخطاء المسح المؤقتة نتجاهلها لكي تستمر الكاميرا في المحاولة
+                    }
+                ).then(() => {
+                    isScannerRunning = true;
+                }).catch(err => {
+                    alert("تعذر تشغيل الكاميرا، يرجى التأكد من صلاحيات المتصفح.");
+                    box.classList.add('hidden');
+                    isScannerRunning = false;
+                });
+            }
+        }
 
         function checkSavedSession() {
             const savedEmail = localStorage.getItem('erp_user_email');
@@ -419,6 +497,10 @@
         }
 
         function navigateTo(viewName) {
+            if (isScannerRunning && viewName !== 'stock') {
+                toggleScanner(); // إغلاق الكاميرا إذا انتقل المستخدم لصفحة أخرى
+            }
+
             const views = ['dashboard', 'branch-ops', 'stock', 'sales', 'transfers', 'requests'];
             views.forEach(v => {
                 const el = document.getElementById(`view-${v}`);
@@ -671,6 +753,9 @@
                         container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد أرصدة متاحة (الرصيد صفر في جميع الفروع).</p>';
                     }
 
+                    // تشغيل صوت التنبيه فور نجاح البحث
+                    playSuccessBeep();
+
                 } else {
                     detailsTitle.innerHTML = `<i class="fa-solid fa-layer-group text-blue-400"></i> تفاصيل الموديل الرئيسي / Model Details`;
                     itemCodeBadge.innerText = `Model: ${searchValue}`;
@@ -708,6 +793,8 @@
                     } else {
                         container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لم يتم العثور على أي أصناف تابعة لهذا الموديل.</p>';
                     }
+
+                    playSuccessBeep();
                 }
             } catch (err) {
                 if (err.name === 'AbortError') return;
@@ -747,7 +834,7 @@
 
             const savedEmail = localStorage.getItem('erp_user_email') || "";
             const branchInfo = getBranchInfo(savedEmail);
-            const branchCode = branchInfo.code; // استخراج كود الفرع مثل "001" من الإيميل
+            const branchCode = branchInfo.code;
 
             branchSubtitle.innerText = `الفرع المخصص: ${branchInfo.name} (كود الفرع: ${branchCode || 'غير محدد'})`;
 
@@ -765,7 +852,7 @@
                     body: JSON.stringify({
                         from_date: fromDate,
                         to_date: toDate,
-                        branch_code: branchCode // تمرير كود الفرع المستخرج تلقائياً للفلترة
+                        branch_code: branchCode
                     })
                 });
 
@@ -780,7 +867,6 @@
                 totalContainer.innerText = `${totalSales.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} SAR`;
                 countContainer.innerText = branchInvoices.length;
 
-                // تجميع وترتيب رجال المبيعات التابعين لهذا الفرع
                 const salesmenMap = {};
                 branchInvoices.forEach(inv => {
                     const seller = inv.sales_partner || inv.owner || "غير محدد";
@@ -851,10 +937,6 @@
             container.innerHTML = '<p class="text-indigo-600 text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري تحميل البيانات... / Loading...</p>';
 
             try {
-                const savedEmail = localStorage.getItem('erp_user_email') || "";
-                const branchInfo = getBranchInfo(savedEmail);
-                const branchCode = branchInfo.code;
-
                 const response = await fetch(`${SERVER_URL}/api/method/frappe.client.get_list`, {
                     method: "POST",
                     headers: authHeaders,
