@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COLIN'S - بوابة خدمات الفروع | Branch Services</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; }</style>
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white font-extrabold px-3 py-1 rounded-lg tracking-wider text-lg">COLIN'S</div>
+                <span id="header-branch-tag" class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">الفرع: لم يتم تحديد الفرع</span>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="text-left hidden md:block">
+                    <span id="user-display-name" class="text-sm font-bold block text-indigo-300">غير مسجل الدخول</span>
+                    <span id="user-branch-subtitle" class="text-[10px] text-slate-400 block">فريق المبيعات / Sales Team</span>
+                </div>
+                <div class="w-9 h-9 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <button id="logout-btn" onclick="handleLogout()" class="hidden text-xs bg-red-600/80 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 mr-2">
+                    <i class="fa-solid fa-right-from-bracket"></i> خروج
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+        
+        <!-- View 1: Dashboard -->
+        <section id="view-dashboard" class="space-y-6">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">الخدمات السريعة / Quick Services</h1>
+                <p class="text-sm text-slate-500">اختر القسم المطلوب للمتابعة والعمليات</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+                <!-- الزر الأول: فحص المخزون -->
+                <div onclick="navigateTo('stock')" class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group flex items-center gap-6">
+                    <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-4xl group-hover:bg-blue-600 group-hover:text-white transition shrink-0">
+                        <i class="fa-solid fa-barcode"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-1">فحص المخزون</h3>
+                        <p class="text-xs text-slate-500">Stock Check & Barcode Search</p>
+                        <span class="inline-flex items-center text-xs font-bold text-blue-600 mt-3 group-hover:translate-x-1 transition">الدخول للفحص <i class="fa-solid fa-arrow-left mr-2"></i></span>
+                    </div>
+                </div>
+
+                <!-- الزر الثاني: عمليات الفروع -->
+                <div onclick="openAuthModal()" class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group flex items-center gap-6">
+                    <div class="w-20 h-20 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-4xl group-hover:bg-indigo-600 group-hover:text-white transition shrink-0">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-xl font-bold text-slate-800 mb-1">عمليات الفروع</h3>
+                            <span id="lock-badge" class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-shield-halved"></i> يتطلب دخول</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Branch Operations & Analytics</p>
+                        <span class="inline-flex items-center text-xs font-bold text-indigo-600 mt-3 group-hover:translate-x-1 transition">عرض قائمة العمليات <i class="fa-solid fa-arrow-left mr-2"></i></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View 1.5: Branch Operations Sub-menu -->
+        <section id="view-branch-ops" class="hidden space-y-6">
+            <button onclick="navigateTo('dashboard')" class="text-indigo-600 font-bold text-sm flex items-center gap-2 mb-2 hover:underline">
+                <i class="fa-solid fa-arrow-right"></i> العودة للقائمة الرئيسية / Back to Main
+            </button>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">🏪 عمليات الفروع / Branch Operations</h1>
+                <p class="text-sm text-slate-500">اختر العملية المطلوبة لعرض التفاصيل والتقارير المخصصة لفرعك</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div onclick="navigateTo('sales')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group">
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:bg-emerald-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-1">الاطلاع على المبيعات</h3>
+                    <p class="text-xs text-slate-500">Branch Sales Analytics</p>
+                </div>
+
+                <div onclick="navigateTo('transfers')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group">
+                    <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:bg-amber-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-boxes-packing"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-1">التحويلات المعلقة</h3>
+                    <p class="text-xs text-slate-500">Pending Transfers (In/Out)</p>
+                </div>
+
+                <div onclick="navigateTo('requests')" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group">
+                    <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-2xl mb-4 group-hover:bg-purple-600 group-hover:text-white transition">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-1">طلبات المواد</h3>
+                    <p class="text-xs text-slate-500">Material Requests Status</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- View 2: Stock Check -->
+        <section id="view-stock" class="hidden space-y-4">
+            <button onclick="navigateTo('dashboard')" class="text-indigo-600 font-bold text-sm flex items-center gap-2 mb-2 hover:underline">
+                <i class="fa-solid fa-arrow-right"></i> العودة للقائمة الرئيسية / Back to Main
+            </button>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    🔍 فحص المخزون والباركود / Stock & Barcode Check
+                </h2>
+
+                <div class="flex items-center gap-6 bg-slate-50 p-3 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700">
+                    <span class="text-slate-500 font-bold">طريقة البحث / Search Method:</span>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="search_type" value="item" checked onchange="updateSearchPlaceholder()" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                        <span>رقم المنتج (Item Code / Barcode)</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="search_type" value="model" onchange="updateSearchPlaceholder()" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                        <span>الموديل (Model / Variant of)</span>
+                    </label>
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" id="stock-search-input" onkeypress="handleKeyPress(event)" placeholder="أدخل كود المنتج Item Code أو الباركود..." class="flex-grow border border-slate-300 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="fetchStockData()" class="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 transition flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass"></i> بحث / Search
+                    </button>
+                </div>
+
+                <div id="stock-details" class="hidden my-4 p-5 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl shadow-lg border border-blue-700/50 space-y-4">
+                    <div class="flex items-center justify-between border-b border-blue-700/50 pb-3">
+                        <h3 class="text-lg font-bold flex items-center gap-2 text-blue-200" id="details-title">
+                            <i class="fa-solid fa-box-open text-blue-400"></i> تفاصيل المنتج الأساسية / Product Details
+                        </h3>
+                        <span id="item-code-badge" class="bg-blue-800/80 text-blue-200 text-xs px-3 py-1 rounded-full font-mono font-semibold border border-blue-600"></span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3" id="item-info-grid"></div>
+
+                    <div id="item-variants-container" class="hidden pt-3 border-t border-blue-700/50">
+                        <span class="text-blue-300 block text-xs mb-2 font-semibold">
+                            <i class="fa-solid fa-layer-group text-blue-400"></i> المقاسات والألوان المتاحة لهذا الموديل (Variants):
+                        </span>
+                        <div id="item-variants-list" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <div id="stock-results" class="mt-4 overflow-x-auto">
+                    <p class="text-slate-400 text-sm">أدخل الكود واضغط بحث لعرض تفاصيل المنتج ورصيد الفروع.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- View 3: Sales -->
+        <section id="view-sales" class="hidden space-y-4">
+            <button onclick="navigateTo('branch-ops')" class="text-indigo-600 font-bold text-sm flex items-center gap-2 mb-2 hover:underline">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة عمليات الفروع / Back to Operations
+            </button>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">📊 ملخص مبيعات الفرع / Sales Analytics</h2>
+                        <p id="sales-branch-name-subtitle" class="text-xs text-indigo-600 font-semibold mt-0.5">الفرع المحدد: -</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+                            <span>من / From:</span>
+                            <input type="date" id="sales-from-date" class="bg-white border border-slate-300 px-2 py-1 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+                            <span>إلى / To:</span>
+                            <input type="date" id="sales-to-date" class="bg-white border border-slate-300 px-2 py-1 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <button onclick="fetchSalesData()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                            <i class="fa-solid fa-filter"></i> تطبيق الفلتر
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-5 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-2xl shadow-md">
+                        <p class="text-xs text-emerald-100 font-bold mb-1">إجمالي المبيعات المكتملة للفترة المحددة</p>
+                        <p id="sales-total-val" class="text-3xl font-black">جاري التحميل...</p>
+                    </div>
+                    <div class="p-5 bg-slate-800 text-white rounded-2xl shadow-md flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 font-bold mb-1">عدد الفواتير المكتملة</p>
+                            <p id="sales-count-val" class="text-3xl font-black text-amber-400">-</p>
+                        </div>
+                        <div class="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center text-2xl text-amber-400">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-2">
+                    <h3 class="text-md font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-500"></i> ترتيب رجال المبيعات الأكثر مبيعاً (Salesmen Ranking)
+                    </h3>
+                    <div id="salesmen-results" class="overflow-x-auto">
+                        <p class="text-slate-400 text-sm">اختر النطاق الزمني واضغط تطبيق الفلتر لعرض الترتيب.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- View 4: Transfers -->
+        <section id="view-transfers" class="hidden space-y-4">
+            <button onclick="navigateTo('branch-ops')" class="text-indigo-600 font-bold text-sm flex items-center gap-2 mb-2 hover:underline">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة عمليات الفروع / Back to Operations
+            </button>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-xl font-bold text-slate-800">🔄 التحويلات المعلقة / Pending Transfers</h2>
+                <div id="transfers-results" class="overflow-x-auto">
+                    <p class="text-slate-400 text-sm">جاري جلب أذون التحويل المعلقة...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- View 5: Requests -->
+        <section id="view-requests" class="hidden space-y-4">
+            <button onclick="navigateTo('branch-ops')" class="text-indigo-600 font-bold text-sm flex items-center gap-2 mb-2 hover:underline">
+                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة عمليات الفروع / Back to Operations
+            </button>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h2 class="text-xl font-bold text-slate-800">📋 حالات طلبات المواد / Material Requests</h2>
+                <div id="requests-results" class="overflow-x-auto">
+                    <p class="text-slate-400 text-sm">جاري تحميل طلبات المواد...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: نافذة تسجيل الدخول -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-lock text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-base">مصادقة ERPNext / Authentication</h3>
+                        <p class="text-[11px] text-slate-400">أدخل معلومات حسابك للوصول لعمليات الفروع</p>
+                    </div>
+                </div>
+                <button onclick="closeAuthModal()" class="text-slate-400 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleERPNextLogin(event)" class="p-6 space-y-4">
+                <div id="auth-error-msg" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-semibold"></div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني / ERPNext Email:</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute right-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="login-email" required placeholder="مثال: 001a@almoosa.com.sa" class="w-full pr-9 pl-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور / Password:</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-key absolute right-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full pr-9 pl-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="submit" id="login-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول / Login
+                    </button>
+                    <button type="button" onclick="closeAuthModal()" class="px-4 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-50 transition">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-400">
+        COLIN'S Retail Integration &copy; 2026
+    </footer>
+
+    <!-- JavaScript Script -->
+    <script>
+        const SERVER_URL = "https://87-237-225-155.nip.io";
+        const API_KEY = "6f039a5a6130b79";
+        const API_SECRET = "9e6d920a8fda252";
+
+        const authHeaders = {
+            "Authorization": `token ${API_KEY}:${API_SECRET}`,
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        };
+
+        const BRANCH_MAP = {
+            "001": { code: "001", name: "Almoosa Outlet Unaizah", warehouse: "001" },
+            "002": { code: "002", name: "Almoosa Unaizah Men", warehouse: "002" },
+            "004": { code: "004", name: "Almousa - Alrass", warehouse: "004" },
+            "005": { code: "005", name: "Jeddah - Colins", warehouse: "005" },
+            "006": { code: "006", name: "Almousa Hufuf", warehouse: "006" },
+            "007": { code: "007", name: "Almousa Buraidah Al Khubaib", warehouse: "007" },
+            "011": { code: "011", name: "Almousa Hail", warehouse: "011" },
+            "015": { code: "015", name: "Jeddah - Almoosa Almahmal", warehouse: "015" },
+            "019": { code: "019", name: "Jeel Al Anaka", warehouse: "019" },
+            "028": { code: "028", name: "Buraidah North", warehouse: "028" },
+            "031": { code: "031", name: "Tabuk", warehouse: "031" },
+            "032": { code: "032", name: "ONLINE POS", warehouse: "032" },
+            "033": { code: "033", name: "Sample Location", warehouse: "033" },
+            "034": { code: "034", name: "Lacali Alsalam", warehouse: "034" },
+            "035": { code: "035", name: "Lacali Hail", warehouse: "035" },
+            "036": { code: "036", name: "Lacali Damam", warehouse: "036" },
+            "037": { code: "037", name: "Lacali Al mahmal", warehouse: "037" }
+        };
+
+        let currentAbortController = null;
+        let isAuthenticatedUser = false;
+
+       window.addEventListener('DOMContentLoaded', () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    
+    // أول يوم في الشهر الحالي
+    const firstDayOfMonth = `${year}-${month}-01`;
+    // تاريخ اليوم الحالي
+    const today = now.toISOString().split('T')[0];
+
+    document.getElementById('sales-from-date').value = firstDayOfMonth;
+    document.getElementById('sales-to-date').value = today;
+
+    checkSavedSession();
+});
+
+        function checkSavedSession() {
+            const savedEmail = localStorage.getItem('erp_user_email');
+            const savedBranch = localStorage.getItem('erp_user_branch');
+
+            if (savedEmail) {
+                isAuthenticatedUser = true;
+                updateHeaderUI(savedEmail, savedBranch);
+            } else {
+                updateHeaderUI(null, null);
+            }
+        }
+
+        function getBranchCodeFromEmail(email) {
+            if (!email) return "";
+            const clean = email.trim().toLowerCase();
+            for (const code in BRANCH_MAP) {
+                if (clean.startsWith(code)) {
+                    return code;
+                }
+            }
+            return "";
+        }
+
+        function getBranchInfo(email) {
+            const code = getBranchCodeFromEmail(email);
+            if (code && BRANCH_MAP[code]) {
+                return BRANCH_MAP[code];
+            }
+            return { code: "", name: email, warehouse: "" };
+        }
+
+        function updateHeaderUI(email, branchName) {
+            const nameEl = document.getElementById('user-display-name');
+            const branchTagEl = document.getElementById('header-branch-tag');
+            const lockBadgeEl = document.getElementById('lock-badge');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            if (email && isAuthenticatedUser) {
+                const info = getBranchInfo(email);
+                const displayTitle = branchName || info.name;
+
+                nameEl.innerText = displayTitle;
+                branchTagEl.innerText = `الفرع: ${displayTitle}`;
+                branchTagEl.classList.remove('bg-slate-800', 'text-slate-300');
+                branchTagEl.classList.add('bg-indigo-900', 'text-indigo-200', 'border-indigo-600');
+                
+                if (lockBadgeEl) {
+                    lockBadgeEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> متاح';
+                    lockBadgeEl.className = 'text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold';
+                }
+                logoutBtn.classList.remove('hidden');
+            } else {
+                nameEl.innerText = "غير مسجل الدخول";
+                branchTagEl.innerText = "الفرع: لم يتم تحديد الفرع";
+                branchTagEl.classList.remove('bg-indigo-900', 'text-indigo-200', 'border-indigo-600');
+                branchTagEl.classList.add('bg-slate-800', 'text-slate-300');
+
+                if (lockBadgeEl) {
+                    lockBadgeEl.innerHTML = '<i class="fa-solid fa-shield-halved"></i> يتطلب دخول';
+                    lockBadgeEl.className = 'text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold';
+                }
+                logoutBtn.classList.add('hidden');
+            }
+        }
+
+        function navigateTo(viewName) {
+            const views = ['dashboard', 'branch-ops', 'stock', 'sales', 'transfers', 'requests'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            const targetView = document.getElementById(`view-${viewName}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            if (viewName === 'sales') fetchSalesData();
+            if (viewName === 'transfers') fetchTransfersData();
+            if (viewName === 'requests') fetchRequestsData();
+        }
+
+        function openAuthModal() {
+            if (isAuthenticatedUser) {
+                navigateTo('branch-ops');
+            } else {
+                document.getElementById('auth-error-msg').classList.add('hidden');
+                document.getElementById('auth-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('erp_user_email');
+            localStorage.removeItem('erp_user_branch');
+            isAuthenticatedUser = false;
+            updateHeaderUI(null, null);
+            navigateTo('dashboard');
+        }
+
+        async function handleERPNextLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorMsg = document.getElementById('auth-error-msg');
+            const loginBtn = document.getElementById('login-btn');
+
+            errorMsg.classList.add('hidden');
+            loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحقق...';
+            loginBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/method/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        usr: email,
+                        pwd: password
+                    })
+                });
+
+                if (response.ok) {
+                    isAuthenticatedUser = true;
+                    const info = getBranchInfo(email);
+
+                    localStorage.setItem('erp_user_email', email);
+                    localStorage.setItem('erp_user_branch', info.name);
+
+                    updateHeaderUI(email, info.name);
+                    closeAuthModal();
+                    navigateTo('branch-ops');
+                } else {
+                    errorMsg.innerText = "البريد الإلكتروني أو كلمة المرور غير صحيحة على ERPNext.";
+                    errorMsg.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Login Error:", err);
+                errorMsg.innerText = "تعذر الاتصال بسيرفر ERPNext. يرجى التأكد من الشابكة/الربط.";
+                errorMsg.classList.remove('hidden');
+            } finally {
+                loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول / Login';
+                loginBtn.disabled = false;
+            }
+        }
+
+        function updateSearchPlaceholder() {
+            const searchType = document.querySelector('input[name="search_type"]:checked').value;
+            const input = document.getElementById('stock-search-input');
+            if (searchType === 'item') {
+                input.placeholder = "أدخل كود المنتج Item Code أو الباركود Barcode...";
+            } else {
+                input.placeholder = "أدخل اسم الموديل Model (مثال: 1065219)...";
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                fetchStockData();
+            }
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            if (currentAbortController) {
+                currentAbortController.abort();
+            }
+            currentAbortController = new AbortController();
+            
+            return fetch(url, {
+                ...options,
+                headers: { ...authHeaders, ...options.headers },
+                signal: currentAbortController.signal
+            });
+        }
+
+        // 1. فحص المخزون والبحث
+        async function fetchStockData() {
+            const searchValue = document.getElementById('stock-search-input').value.trim();
+            const searchType = document.querySelector('input[name="search_type"]:checked').value;
+            const container = document.getElementById('stock-results');
+            const detailsBox = document.getElementById('stock-details');
+            const infoGrid = document.getElementById('item-info-grid');
+            const itemCodeBadge = document.getElementById('item-code-badge');
+            const detailsTitle = document.getElementById('details-title');
+            const variantsContainer = document.getElementById('item-variants-container');
+            const variantsList = document.getElementById('item-variants-list');
+
+            if (!searchValue) return alert('برجاء إدخال قيمة البحث / Please enter a search value');
+
+            container.innerHTML = '<p class="text-indigo-600 text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري البحث... / Searching...</p>';
+            detailsBox.classList.add('hidden');
+            infoGrid.innerHTML = '';
+            variantsContainer.classList.add('hidden');
+            variantsList.innerHTML = '';
+
+            try {
+                if (searchType === 'item') {
+                    let item = null;
+                    let realItemCode = searchValue;
+
+                    const itemUrl = `${SERVER_URL}/api/resource/Item/${encodeURIComponent(searchValue)}`;
+                    const itemRes = await fetchWithAuth(itemUrl);
+
+                    if (itemRes.ok) {
+                        const itemJson = await itemRes.json();
+                        item = itemJson.data;
+                        realItemCode = item.name;
+                    } else {
+                        const searchRes = await fetchWithAuth(`${SERVER_URL}/api/resource/Item?filters=${encodeURIComponent(JSON.stringify([["item_code", "=", searchValue]]))}`);
+                        if (searchRes.ok) {
+                            const searchJson = await searchRes.json();
+                            if (searchJson.data && searchJson.data.length > 0) {
+                                item = searchJson.data[0];
+                                realItemCode = item.name;
+                            }
+                        }
+                    }
+
+                    if (!item) {
+                        container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لم يتم العثور على الصنف المطلوب.</p>';
+                        return;
+                    }
+
+                    const variantOfVal = item.variant_of || '-';
+                    let colorVal = item.color || '-';
+                    let sizeVal = item.size || '-';
+                    let rawGroup = item.item_group || '';
+
+                    if (variantOfVal && variantOfVal !== '-') {
+                        const scriptUrl = `${SERVER_URL}/api/method/get_item_variants?search_value=${encodeURIComponent(variantOfVal)}`;
+                        const scriptRes = await fetchWithAuth(scriptUrl).catch(() => null);
+                        if (scriptRes && scriptRes.ok) {
+                            const scriptJson = await scriptRes.json();
+                            const variants = scriptJson.message || [];
+                            const matchedVar = variants.find(v => (v.item_code === realItemCode || v.name === realItemCode));
+                            if (matchedVar) {
+                                colorVal = matchedVar.color || colorVal;
+                                sizeVal = matchedVar.size || sizeVal;
+                                if (matchedVar.item_group) rawGroup = matchedVar.item_group;
+                            }
+                        }
+                    }
+
+                    let genderVal = '-';
+                    let categoryVal = '-';
+                    let groupVal = '-';
+                    let subGroupVal = '-';
+
+                    if (rawGroup) {
+                        const parts = rawGroup.split('.').map(p => p.trim()).filter(p => p.toUpperCase() !== 'SALEABLE');
+                        if (parts.length >= 1) genderVal = parts[0];
+                        if (parts.length >= 2) categoryVal = parts[1];
+                        if (parts.length >= 3) groupVal = parts[2];
+                        if (parts.length >= 4) subGroupVal = parts[3];
+                    }
+
+                    detailsTitle.innerHTML = `<i class="fa-solid fa-box-open text-blue-400"></i> تفاصيل المنتج الأساسية / Product Details`;
+                    itemCodeBadge.innerText = realItemCode;
+
+                    const brandVal = item.brand || "COLIN'S";
+
+                    infoGrid.innerHTML = `
+                        <div onclick="searchByModel('${variantOfVal}')" class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[130px] cursor-pointer hover:border-cyan-400 hover:bg-blue-900 transition" title="اضغط لعرض جميع أصناف الموديل الرئيسي">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold flex items-center justify-between">
+                                <span><i class="fa-solid fa-diagram-project text-amber-400"></i> الموديل / Variant Of</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-xs text-cyan-300"></i>
+                            </span>
+                            <span class="font-extrabold text-amber-300 text-base font-mono break-all underline decoration-dotted">${variantOfVal}</span>
+                        </div>
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[130px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-venus-mars text-blue-400"></i> النوع / Gender</span>
+                            <span class="font-bold text-white text-base break-all">${genderVal}</span>
+                        </div>
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[130px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-layer-group text-blue-400"></i> الفئة / Category</span>
+                            <span class="font-bold text-white text-base break-all">${categoryVal}</span>
+                        </div>
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[130px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-folder text-blue-400"></i> المجموعة / Group</span>
+                            <span class="font-bold text-white text-base break-all">${groupVal}</span>
+                        </div>
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[130px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-list-check text-blue-400"></i> المجموعة الفرعية / Sub Group</span>
+                            <span class="font-bold text-white text-base break-all">${subGroupVal}</span>
+                        </div>
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[130px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-palette text-blue-400"></i> اللون / Color</span>
+                            <span class="font-extrabold text-cyan-300 text-base break-all">${colorVal}</span>
+                        </div>
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[130px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-ruler-combined text-blue-400"></i> المقاس / Size</span>
+                            <span class="font-extrabold text-cyan-300 text-base break-all">${sizeVal}</span>
+                        </div>
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[130px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-copyright text-blue-400"></i> البراند / Brand</span>
+                            <span class="font-bold text-white text-base break-all">${brandVal}</span>
+                        </div>
+                    `;
+                    detailsBox.classList.remove('hidden');
+
+                    const binFilters = JSON.stringify([["item_code", "=", realItemCode], ["actual_qty", ">", 0]]);
+                    const binUrl = `${SERVER_URL}/api/resource/Bin?filters=${encodeURIComponent(binFilters)}&fields=${encodeURIComponent(JSON.stringify(["warehouse", "actual_qty"]))}`;
+                    const binRes = await fetchWithAuth(binUrl);
+                    const binJson = await binRes.json();
+
+                    if (binJson.data && binJson.data.length > 0) {
+                        let html = `<table class="w-full text-sm text-right border border-slate-200 rounded-xl overflow-hidden shadow-sm"><thead class="bg-slate-800 text-white border-b"><tr><th class="p-3">المستودع / الفرع</th><th class="p-3">الرصيد المتاح</th></tr></thead><tbody>`;
+                        binJson.data.forEach(row => {
+                            html += `<tr class="border-b hover:bg-slate-50"><td class="p-3 font-semibold text-slate-800">${row.warehouse}</td><td class="p-3 text-indigo-600 font-bold text-base">${row.actual_qty}</td></tr>`;
+                        });
+                        container.innerHTML = html + `</tbody></table>`;
+                    } else {
+                        container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد أرصدة متاحة (الرصيد صفر في جميع الفروع).</p>';
+                    }
+
+                } else {
+                    detailsTitle.innerHTML = `<i class="fa-solid fa-layer-group text-blue-400"></i> تفاصيل الموديل الرئيسي / Model Details`;
+                    itemCodeBadge.innerText = `Model: ${searchValue}`;
+
+                    infoGrid.innerHTML = `
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[150px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-diagram-project text-blue-400"></i> الموديل / Variant Of</span>
+                            <span class="font-extrabold text-amber-300 text-base font-mono">${searchValue}</span>
+                        </div>
+                        <div class="bg-blue-950/60 p-3.5 rounded-xl border border-blue-700/60 shadow-inner flex-1 min-w-[150px]">
+                            <span class="text-blue-300 block text-xs mb-1 font-semibold"><i class="fa-solid fa-copyright text-blue-400"></i> البراند / Brand</span>
+                            <span class="font-bold text-white text-base">COLIN'S</span>
+                        </div>
+                    `;
+                    detailsBox.classList.remove('hidden');
+
+                    let variantData = [];
+                    const scriptUrl = `${SERVER_URL}/api/method/get_item_variants?search_value=${encodeURIComponent(searchValue)}`;
+                    const scriptRes = await fetchWithAuth(scriptUrl).catch(() => null);
+
+                    if (scriptRes && scriptRes.ok) {
+                        const scriptJson = await scriptRes.json();
+                        variantData = scriptJson.message || [];
+                    }
+
+                    if (variantData.length > 0) {
+                        let html = `<div class="mb-3 flex justify-between items-center"><h4 class="font-bold text-slate-700 text-sm">قائمة الأصناف التابعة للموديل (${variantData.length}):</h4><span class="text-xs text-indigo-600 font-semibold">* اضغط على كود أي منتج للفحص المباشر</span></div>`;
+                        html += `<table class="w-full text-sm text-right border border-slate-200 rounded-xl overflow-hidden shadow-sm"><thead class="bg-slate-800 text-white border-b"><tr><th class="p-3">كود المنتج (Item Code)</th><th class="p-3">اللون (Color)</th><th class="p-3">المقاس (Size)</th><th class="p-3 text-center">الإجراء / Action</th></tr></thead><tbody>`;
+                        
+                        variantData.forEach(row => {
+                            const itemCode = row.item_code || row.name;
+                            html += `<tr class="border-b hover:bg-indigo-50 transition"><td class="p-3 font-bold text-indigo-600 font-mono">${itemCode}</td><td class="p-3 font-semibold text-slate-700">${row.color || '-'}</td><td class="p-3 font-semibold text-slate-700">${row.size || '-'}</td><td class="p-3 text-center"><button onclick="selectItemDirectly('${itemCode}')" class="bg-indigo-100 hover:bg-indigo-600 hover:text-white text-indigo-700 px-3 py-1 rounded-lg text-xs font-bold transition">عرض المخزون <i class="fa-solid fa-arrow-left mr-1"></i></button></td></tr>`;
+                        });
+                        container.innerHTML = html + `</tbody></table>`;
+                    } else {
+                        container.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لم يتم العثور على أي أصناف تابعة لهذا الموديل.</p>';
+                    }
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                console.error("Stock Error:", err);
+                container.innerHTML = `<div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"><b>تعذر الجلب / Fetch Failed:</b> ${err.message}.</div>`;
+            }
+        }
+
+        function searchByModel(modelCode) {
+            if (!modelCode || modelCode === '-' || modelCode === 'undefined') return;
+            
+            const cleanModel = modelCode.trim();
+            document.getElementById('stock-results').innerHTML = '';
+            
+            const radioButtons = document.querySelectorAll('input[name="search_type"]');
+            if (radioButtons.length > 1) {
+                radioButtons[1].checked = true;
+                updateSearchPlaceholder();
+            }
+
+            document.getElementById('stock-search-input').value = cleanModel;
+            fetchStockData();
+        }
+
+        function selectItemDirectly(itemCode) {
+            document.querySelectorAll('input[name="search_type"]')[0].checked = true;
+            document.getElementById('stock-search-input').value = itemCode;
+            fetchStockData();
+        }
+
+        // 2. شاشة المبيعات التفاعلية مع إرسال كود الفرع المستخرج من الإيميل تلقائياً
+        async function fetchSalesData() {
+            const totalContainer = document.getElementById('sales-total-val');
+            const countContainer = document.getElementById('sales-count-val');
+            const salesmenContainer = document.getElementById('salesmen-results');
+            const branchSubtitle = document.getElementById('sales-branch-name-subtitle');
+
+            const savedEmail = localStorage.getItem('erp_user_email') || "";
+            const branchInfo = getBranchInfo(savedEmail);
+            const branchCode = branchInfo.code; // استخراج كود الفرع مثل "001" من الإيميل
+
+            branchSubtitle.innerText = `الفرع المخصص: ${branchInfo.name} (كود الفرع: ${branchCode || 'غير محدد'})`;
+
+            const fromDate = document.getElementById('sales-from-date').value || new Date().toISOString().split('T')[0];
+            const toDate = document.getElementById('sales-to-date').value || new Date().toISOString().split('T')[0];
+
+            totalContainer.innerText = "جاري الحساب...";
+            countContainer.innerText = "...";
+            salesmenContainer.innerHTML = '<p class="text-indigo-600 text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري جلب الفواتير لفرعك عبر Server Script...</p>';
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/method/get_branch_sales_summary`, {
+                    method: "POST",
+                    headers: authHeaders,
+                    body: JSON.stringify({
+                        from_date: fromDate,
+                        to_date: toDate,
+                        branch_code: branchCode // تمرير كود الفرع المستخرج تلقائياً للفلترة
+                    })
+                });
+
+                if (!response.ok) throw new Error(`كود الخطأ: ${response.status}`);
+
+                const resData = await response.json();
+                const resultMessage = resData.message || { pos: [], sales: [] };
+
+                let branchInvoices = [...(resultMessage.pos || []), ...(resultMessage.sales || [])];
+
+                const totalSales = branchInvoices.reduce((acc, curr) => acc + (curr.grand_total || 0), 0);
+                totalContainer.innerText = `${totalSales.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} SAR`;
+                countContainer.innerText = branchInvoices.length;
+
+                // تجميع وترتيب رجال المبيعات التابعين لهذا الفرع
+                const salesmenMap = {};
+                branchInvoices.forEach(inv => {
+                    const seller = inv.sales_partner || inv.owner || "غير محدد";
+                    if (!salesmenMap[seller]) {
+                        salesmenMap[seller] = { count: 0, total: 0 };
+                    }
+                    salesmenMap[seller].count += 1;
+                    salesmenMap[seller].total += (inv.grand_total || 0);
+                });
+
+                const sortedSalesmen = Object.keys(salesmenMap).map(key => ({
+                    name: key,
+                    count: salesmenMap[key].count,
+                    total: salesmenMap[key].total
+                })).sort((a, b) => b.total - a.total);
+
+                if (sortedSalesmen.length > 0) {
+                    let html = `
+                        <table class="w-full text-sm text-right border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                            <thead class="bg-slate-800 text-white border-b">
+                                <tr>
+                                    <th class="p-3 text-center w-16">الترتيب</th>
+                                    <th class="p-3">رجل المبيعات / Salesman</th>
+                                    <th class="p-3 text-center">عدد الفواتير</th>
+                                    <th class="p-3">إجمالي المبيعات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    sortedSalesmen.forEach((sm, idx) => {
+                        let badgeColor = "bg-slate-100 text-slate-700";
+                        let icon = `#${idx + 1}`;
+                        if (idx === 0) { badgeColor = "bg-amber-100 text-amber-800 border border-amber-300"; icon = "🥇 1"; }
+                        else if (idx === 1) { badgeColor = "bg-slate-200 text-slate-800"; icon = "🥈 2"; }
+                        else if (idx === 2) { badgeColor = "bg-amber-50 text-amber-900"; icon = "🥉 3"; }
+
+                        html += `
+                            <tr class="border-b hover:bg-slate-50 transition">
+                                <td class="p-3 text-center font-bold">
+                                    <span class="px-2.5 py-1 rounded-lg text-xs font-black ${badgeColor}">${icon}</span>
+                                </td>
+                                <td class="p-3 font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="fa-solid fa-user-tag text-indigo-500"></i> ${sm.name}
+                                </td>
+                                <td class="p-3 text-center font-semibold text-slate-600">${sm.count}</td>
+                                <td class="p-3 font-extrabold text-emerald-600">${sm.total.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} SAR</td>
+                            </tr>
+                        `;
+                    });
+
+                    salesmenContainer.innerHTML = html + `</tbody></table>`;
+                } else {
+                    salesmenContainer.innerHTML = '<p class="text-amber-600 text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد مبيعات مسجلة لفرعك في هذه الفترة المحددة.</p>';
+                }
+
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                console.error("Sales Error:", err);
+                totalContainer.innerText = "خطأ في الاتصال";
+                salesmenContainer.innerHTML = `<div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"><b>تعذر جلب بيانات المبيعات:</b> ${err.message}</div>`;
+            }
+        }
+
+        // 3. التحويلات المعلقة
+        async function fetchTransfersData() {
+            const container = document.getElementById('transfers-results');
+            container.innerHTML = '<p class="text-indigo-600 text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري تحميل البيانات... / Loading...</p>';
+
+            try {
+                const savedEmail = localStorage.getItem('erp_user_email') || "";
+                const branchInfo = getBranchInfo(savedEmail);
+                const branchCode = branchInfo.code;
+
+                const response = await fetch(`${SERVER_URL}/api/method/frappe.client.get_list`, {
+                    method: "POST",
+                    headers: authHeaders,
+                    body: JSON.stringify({
+                        doctype: "Stock Entry",
+                        fields: ["name", "from_warehouse", "to_warehouse"],
+                        filters: [
+                            ["docstatus", "=", 0],
+                            ["purpose", "=", "Material Transfer"]
+                        ],
+                        limit_page_length: 50
+                    })
+                });
+
+                if (!response.ok) throw new Error(`كود الخطأ: ${response.status}`);
+
+                const data = await response.json();
+                let entries = data.message || [];
+
+                if (entries.length > 0) {
+                    let html = `<table class="w-full text-sm text-right border rounded-xl overflow-hidden shadow-sm"><thead class="bg-slate-100 border-b"><tr><th class="p-3">رقم الإذن (Voucher No)</th><th class="p-3">من (From)</th><th class="p-3">إلى (To)</th></tr></thead><tbody>`;
+                    entries.forEach(row => {
+                        html += `<tr class="border-b hover:bg-slate-50"><td class="p-3 font-bold">${row.name}</td><td class="p-3">${row.from_warehouse || '-'}</td><td class="p-3">${row.to_warehouse || '-'}</td></tr>`;
+                    });
+                    container.innerHTML = html + `</tbody></table>`;
+                } else {
+                    container.innerHTML = '<p class="text-slate-500 text-sm">لا توجد تحويلات معلقة حالياً. / No pending transfers.</p>';
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                console.error("Transfers Error:", err);
+                container.innerHTML = `<p class="text-red-500 text-sm">فشل جلب البيانات: ${err.message}</p>`;
+            }
+        }
+
+        // 4. طلبات المواد
+        async function fetchRequestsData() {
+            const container = document.getElementById('requests-results');
+            container.innerHTML = '<p class="text-indigo-600 text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري تحميل البيانات... / Loading...</p>';
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/method/frappe.client.get_list`, {
+                    method: "POST",
+                    headers: authHeaders,
+                    body: JSON.stringify({
+                        doctype: "Material Request",
+                        fields: ["name", "status", "transaction_date"],
+                        filters: [["docstatus", "<", 2]],
+                        limit_page_length: 20
+                    })
+                });
+
+                if (!response.ok) throw new Error(`كود الخطأ: ${response.status}`);
+
+                const data = await response.json();
+                let requests = data.message || [];
+
+                if (requests.length > 0) {
+                    let html = `<table class="w-full text-sm text-right border rounded-xl overflow-hidden shadow-sm"><thead class="bg-slate-100 border-b"><tr><th class="p-3">رقم الطلب (Request ID)</th><th class="p-3">التاريخ (Date)</th><th class="p-3">الحالة (Status)</th></tr></thead><tbody>`;
+                    requests.forEach(row => {
+                        html += `<tr class="border-b hover:bg-slate-50"><td class="p-3 font-bold">${row.name}</td><td class="p-3">${row.transaction_date}</td><td class="p-3"><span class="bg-purple-100 text-purple-700 px-2.5 py-1 rounded-lg text-xs font-bold">${row.status}</span></td></tr>`;
+                    });
+                    container.innerHTML = html + `</tbody></table>`;
+                } else {
+                    container.innerHTML = '<p class="text-slate-500 text-sm">لا توجد طلبات مواد حالياً. / No material requests found.</p>';
+                }
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                console.error("Requests Error:", err);
+                container.innerHTML = `<p class="text-red-500 text-sm">فشل جلب البيانات: ${err.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
