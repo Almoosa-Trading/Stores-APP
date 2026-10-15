@@ -412,14 +412,15 @@
                 }
                 
                 const config = {
-                    fps: 15,
-                    qrbox: { width: 280, height: 160 },
+                    fps: 20,
+                    qrbox: { width: 300, height: 180 },
                     formatsToSupport: [
-                        Html5QrcodeSupportedFormats.UPC_A,
-                        Html5QrcodeSupportedFormats.UPC_E,
                         Html5QrcodeSupportedFormats.EAN_13,
                         Html5QrcodeSupportedFormats.EAN_8,
+                        Html5QrcodeSupportedFormats.UPC_A,
+                        Html5QrcodeSupportedFormats.UPC_E,
                         Html5QrcodeSupportedFormats.CODE_128,
+                        Html5QrcodeSupportedFormats.CODE_39,
                         Html5QrcodeSupportedFormats.QR_CODE
                     ]
                 };
@@ -626,7 +627,7 @@
             });
         }
 
-        // 1. فحص المخزون والبحث (محدث بالكامل للبحث الآمن بالكود والباركود عبر الـ GET Server Method)
+        // 1. فحص المخزون والبحث
         async function fetchStockData() {
             const searchValue = document.getElementById('stock-search-input').value.trim();
             const searchType = document.querySelector('input[name="search_type"]:checked').value;
@@ -651,7 +652,6 @@
                     let item = null;
                     let realItemCode = searchValue;
 
-                    // استدعاء الـ Server Script الجديد للبحث بالباركود أو الكود عبر GET
                     const apiRes = await fetch(`${SERVER_URL}/api/method/search_item_by_barcode?barcode=${encodeURIComponent(searchValue)}`, {
                         method: "GET",
                         headers: {
@@ -668,7 +668,6 @@
                         }
                     }
 
-                    // دعم احتياطي للبحث المباشر بكود المنتج إذا لم يتم إرجاع نتيجة
                     if (!item) {
                         const searchRes = await fetchWithAuth(`${SERVER_URL}/api/resource/Item?filters=${encodeURIComponent(JSON.stringify([["item_code", "=", searchValue]]))}`);
                         if (searchRes.ok) {
