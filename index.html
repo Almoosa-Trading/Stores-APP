@@ -372,16 +372,16 @@
         let html5QrCode = null;
         let isScannerRunning = false;
 
-        // دالة ذكية محدثة لتجربة الصيغ (webp -> png -> jpg) مع ضغط الحجم عبر الوسيط
+        // دالة ذكية تبدأ بالصيغة الأساسية (jpg) وتنتقل تصاعدياً (png ثم webp) عند الفشل
         function handleImageError(imgElement, cleanModel, pureColor) {
             const currentSrc = imgElement.src;
             const colorPart = pureColor ? `-${pureColor}` : '';
             
-            if (currentSrc.includes('.webp')) {
+            if (currentSrc.includes('.jpg')) {
                 const nextUrl = `http://almoosa3537115.drayddns.com:6035/${cleanModel}${colorPart}.png`;
                 imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(nextUrl.replace('http://', ''))}&w=400&h=400&fit=cover&q=85`;
             } else if (currentSrc.includes('.png')) {
-                const nextUrl = `http://almoosa3537115.drayddns.com:6035/${cleanModel}${colorPart}.jpg`;
+                const nextUrl = `http://almoosa3537115.drayddns.com:6035/${cleanModel}${colorPart}.webp`;
                 imgElement.src = `https://images.weserv.nl/?url=${encodeURIComponent(nextUrl.replace('http://', ''))}&w=400&h=400&fit=cover&q=85`;
             } else {
                 imgElement.onerror = null;
@@ -774,7 +774,7 @@
 
                     const brandVal = item.brand || "COLIN'S";
 
-                    // تجهيز اسم الملف ببدء البحث بصيغة webp لضمان جلب Z5344-1-tan.webp
+                    // البدء دائماً بالصيغة الأساسية .jpg ثم التحويل التلقائي عند الخطأ
                     const cleanModel = (variantOfVal !== '-' ? variantOfVal : searchValue).trim();
                     const pureColor = cleanColorName(colorVal);
                     
@@ -783,7 +783,7 @@
                         baseImageName += `-${pureColor}`;
                     }
 
-                    const originalUrl = `http://almoosa3537115.drayddns.com:6035/${baseImageName}.webp`;
+                    const originalUrl = `http://almoosa3537115.drayddns.com:6035/${baseImageName}.jpg`;
                     const proxyImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(originalUrl.replace('http://', ''))}&w=400&h=400&fit=cover&q=85`;
 
                     infoGrid.innerHTML = `
@@ -791,7 +791,7 @@
                             <span class="text-blue-300 block text-[11px] font-semibold">
                                 <i class="fa-solid fa-image text-cyan-400"></i> صورة المنتج (انقر للفتح/التحميل)
                             </span>
-                            <a href="${originalUrl}" target="_blank" download="${baseImageName}.webp" class="w-32 h-32 sm:w-40 sm:h-40 bg-slate-900 rounded-lg overflow-hidden border border-blue-600 hover:border-cyan-400 transition flex items-center justify-center p-0.5 group relative">
+                            <a href="${originalUrl}" target="_blank" download="${baseImageName}.jpg" class="w-32 h-32 sm:w-40 sm:h-40 bg-slate-900 rounded-lg overflow-hidden border border-blue-600 hover:border-cyan-400 transition flex items-center justify-center p-0.5 group relative">
                                 <img src="${proxyImageUrl}" alt="Product Image" class="w-full h-full object-cover rounded group-hover:scale-105 transition duration-200" onerror="handleImageError(this, '${cleanModel}', '${pureColor}')">
                                 <div class="absolute inset-0 bg-blue-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
                                     <i class="fa-solid fa-download"></i> تحميل
@@ -861,7 +861,7 @@
                     playSuccessBeep();
 
                 } else {
-                    // البحث عن طريق الموديل (بدون صورة بناءً على رغبتك السابقة)
+                    // البحث عن طريق الموديل (بدون صورة بناءً على طلبك)
                     detailsTitle.innerHTML = `<i class="fa-solid fa-layer-group text-blue-400"></i> تفاصيل الموديل الرئيسي`;
                     itemCodeBadge.innerText = `Model: ${searchValue}`;
 
