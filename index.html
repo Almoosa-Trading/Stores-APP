@@ -13,6 +13,17 @@
     <!-- مكتبة قراءة الباركود والـ UPC عبر الكاميرا Html5Qrcode -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>body { font-family: 'Cairo', sans-serif; }</style>
+
+
+
+<!-- PWA Manifest & Theme Color -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081559.png">
+
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col justify-between">
 
@@ -1031,6 +1042,17 @@
                 container.innerHTML = `<p class="text-red-500 text-sm">فشل جلب البيانات: ${err.message}</p>`;
             }
         }
+
+
+
+
+        if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker Successfully Registered!', reg))
+            .catch(err => console.error('Service Worker Registration Failed:', err));
+    });
+}
     </script>
 </body>
 </html>
