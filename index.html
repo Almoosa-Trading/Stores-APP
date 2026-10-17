@@ -757,7 +757,7 @@
 
                     const brandVal = item.brand || "COLIN'S";
 
-                    // تجهيز اسم الملف بناءً على الموديل واللون
+                    // تجهيز اسم الملف وتمريره عبر الوسيط الآمن لتجاوز حظر HTTPS/HTTP على GitHub Pages
                     const cleanModel = (variantOfVal !== '-' ? variantOfVal : searchValue).trim();
                     const pureColor = cleanColorName(colorVal);
                     
@@ -767,15 +767,15 @@
                     }
                     imageName += `.jpg`;
 
-                    const itemImageUrl = `http://almoosa3537115.drayddns.com:6035/${imageName}`;
+                    const rawItemImageUrl = `http://almoosa3537115.drayddns.com:6035/${imageName}`;
+                    const itemImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(rawItemImageUrl.replace('http://', ''))}`;
 
                     infoGrid.innerHTML = `
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner col-span-2 flex flex-col items-center justify-center space-y-2">
                             <span class="text-blue-300 block text-[11px] font-semibold">
                                 <i class="fa-solid fa-image text-cyan-400"></i> صورة المنتج (انقر للفتح/التحميل)
                             </span>
-                            <!-- جعل الصورة قابلة للنقر والتحميل مباشرة -->
-                            <a href="${itemImageUrl}" target="_blank" download="${imageName}" class="w-32 h-32 sm:w-40 sm:h-40 bg-slate-900 rounded-lg overflow-hidden border border-blue-600 hover:border-cyan-400 transition flex items-center justify-center p-1 group relative">
+                            <a href="${rawItemImageUrl}" target="_blank" download="${imageName}" class="w-32 h-32 sm:w-40 sm:h-40 bg-slate-900 rounded-lg overflow-hidden border border-blue-600 hover:border-cyan-400 transition flex items-center justify-center p-1 group relative">
                                 <img src="${itemImageUrl}" alt="Product Image" class="object-contain w-full h-full rounded group-hover:scale-105 transition duration-200" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=No+Image';">
                                 <div class="absolute inset-0 bg-blue-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
                                     <i class="fa-solid fa-download"></i> تحميل
@@ -850,12 +850,13 @@
                     itemCodeBadge.innerText = `Model: ${searchValue}`;
 
                     const cleanModel = searchValue.trim();
-                    const modelImageUrl = `http://almoosa3537115.drayddns.com:6035/${cleanModel}.jpg`;
+                    const rawModelImageUrl = `http://almoosa3537115.drayddns.com:6035/${cleanModel}.jpg`;
+                    const modelImageUrl = `https://images.weserv.nl/?url=${encodeURIComponent(rawModelImageUrl.replace('http://', ''))}`;
 
                     infoGrid.innerHTML = `
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner col-span-2 flex flex-col items-center justify-center space-y-2">
                             <span class="text-blue-300 block text-[11px] font-semibold"><i class="fa-solid fa-image text-cyan-400"></i> صورة الموديل (انقر للفتح/التحميل)</span>
-                            <a href="${modelImageUrl}" target="_blank" download="${cleanModel}.jpg" class="w-32 h-32 sm:w-40 sm:h-40 bg-slate-900 rounded-lg overflow-hidden border border-blue-600 hover:border-cyan-400 transition flex items-center justify-center p-1 group relative">
+                            <a href="${rawModelImageUrl}" target="_blank" download="${cleanModel}.jpg" class="w-32 h-32 sm:w-40 sm:h-40 bg-slate-900 rounded-lg overflow-hidden border border-blue-600 hover:border-cyan-400 transition flex items-center justify-center p-1 group relative">
                                 <img src="${modelImageUrl}" alt="Model Image" class="object-contain w-full h-full rounded group-hover:scale-105 transition duration-200" onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=No+Image';">
                                 <div class="absolute inset-0 bg-blue-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
                                     <i class="fa-solid fa-download"></i> تحميل
