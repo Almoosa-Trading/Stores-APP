@@ -30,8 +30,12 @@
     <!-- Header -->
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- الشعار مع زر Home للعودة للرئيسية -->
             <div class="flex items-center gap-2 sm:gap-3">
-                <div class="bg-indigo-600 text-white font-extrabold px-2.5 py-1 rounded-lg tracking-wider text-base sm:text-lg">COLIN'S</div>
+                <div onclick="navigateTo('dashboard')" title="الرئيسية / Home" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-3 py-1 rounded-lg tracking-wider text-base sm:text-lg cursor-pointer transition flex items-center gap-2 select-none active:scale-95">
+                    <i class="fa-solid fa-house text-sm"></i>
+                    <span>COLIN'S</span>
+                </div>
                 <span id="header-branch-tag" class="text-[11px] sm:text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700 truncate max-w-[140px] sm:max-w-none">الفرع: لم يتم تحديد الفرع</span>
             </div>
             
@@ -212,7 +216,19 @@
                         <p id="sales-branch-name-subtitle" class="text-xs text-indigo-600 font-semibold mt-0.5">الفرع المحدد: -</p>
                     </div>
 
+                    <!-- شريط التواريخ مع فلتر المواعيد السريعة -->
                     <div class="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 w-full sm:w-auto">
+                        <div class="flex items-center gap-1 text-xs font-bold text-slate-600">
+                            <i class="fa-solid fa-calendar-check text-indigo-600"></i>
+                            <select id="sales-preset-select" onchange="setSalesDateRange(this.value)" class="bg-white border border-slate-300 px-2 py-1 rounded-lg text-xs font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                                <option value="month">هذا الشهر</option>
+                                <option value="today">اليوم</option>
+                                <option value="yesterday">أمس</option>
+                                <option value="week">هذا الأسبوع</option>
+                                <option value="year">هذه السنة</option>
+                            </select>
+                        </div>
+
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
                             <span>من:</span>
                             <input type="date" id="sales-from-date" class="bg-white border border-slate-300 px-2 py-1 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500">
@@ -230,7 +246,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="p-4 sm:p-5 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-2xl shadow-md">
                         <p class="text-xs text-emerald-100 font-bold mb-1">إجمالي المبيعات المكتملة للفترة</p>
-                        <p id="sales-total-val" class="text-2xl sm:text-3xl font-black">جاري التحميل...</p>
+                        <p id="sales-total-val" class="text-2xl sm:text-3xl font-black">جاري الحساب...</p>
                     </div>
                     <div class="p-4 sm:p-5 bg-slate-800 text-white rounded-2xl shadow-md flex items-center justify-between">
                         <div>
@@ -372,7 +388,50 @@
         let html5QrCode = null;
         let isScannerRunning = false;
 
-        // دالة ذكية تبدأ بالصيغة الأساسية (jpg) وتنتقل تصاعدياً (png ثم webp) عند الفشل
+        function setSalesDateRange(rangeType) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+
+            let fromStr = todayStr;
+            let toStr = todayStr;
+
+            if (rangeType === 'today') {
+                fromStr = todayStr;
+                toStr = todayStr;
+            } else if (rangeType === 'yesterday') {
+                const prev = new Date(now);
+                prev.setDate(now.getDate() - 1);
+                const pY = prev.getFullYear();
+                const pM = String(prev.getMonth() + 1).padStart(2, '0');
+                const pD = String(prev.getDate()).padStart(2, '0');
+                fromStr = `${pY}-${pM}-${pD}`;
+                toStr = fromStr;
+            } else if (rangeType === 'week') {
+                const dayOfWeek = now.getDay();
+                const firstDay = new Date(now);
+                firstDay.setDate(now.getDate() - dayOfWeek);
+                const fY = firstDay.getFullYear();
+                const fM = String(firstDay.getMonth() + 1).padStart(2, '0');
+                const fD = String(firstDay.getDate()).padStart(2, '0');
+                fromStr = `${fY}-${fM}-${fD}`;
+                toStr = todayStr;
+            } else if (rangeType === 'month') {
+                fromStr = `${year}-${month}-01`;
+                toStr = todayStr;
+            } else if (rangeType === 'year') {
+                fromStr = `${year}-01-01`;
+                toStr = todayStr;
+            }
+
+            document.getElementById('sales-from-date').value = fromStr;
+            document.getElementById('sales-to-date').value = toStr;
+
+            fetchSalesData();
+        }
+
         function handleImageError(imgElement, cleanModel, pureColor) {
             const currentSrc = imgElement.src;
             const colorPart = pureColor ? `-${pureColor}` : '';
@@ -389,7 +448,6 @@
             }
         }
 
-        // تسجيل Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
@@ -399,16 +457,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            
-            const firstDayOfMonth = `${year}-${month}-01`;
-            const today = now.toISOString().split('T')[0];
-
-            document.getElementById('sales-from-date').value = firstDayOfMonth;
-            document.getElementById('sales-to-date').value = today;
-
+            setSalesDateRange('month');
             checkSavedSession();
         });
 
@@ -671,7 +720,6 @@
             });
         }
 
-        // دالة تنظيف اسم اللون
         function cleanColorName(colorStr) {
             if (!colorStr || colorStr === '-') return '';
             let cleaned = colorStr.replace(/[^a-zA-Z\s]/g, '').trim();
@@ -679,7 +727,6 @@
             return parts.length > 0 ? parts[parts.length - 1].toLowerCase() : '';
         }
 
-        // 1. فحص المخزون
         async function fetchStockData() {
             const searchValue = document.getElementById('stock-search-input').value.trim();
             const searchType = document.querySelector('input[name="search_type"]:checked').value;
@@ -774,7 +821,6 @@
 
                     const brandVal = item.brand || "COLIN'S";
 
-                    // البدء دائماً بالصيغة الأساسية .jpg ثم التحويل التلقائي عند الخطأ
                     const cleanModel = (variantOfVal !== '-' ? variantOfVal : searchValue).trim();
                     const pureColor = cleanColorName(colorVal);
                     
@@ -861,7 +907,6 @@
                     playSuccessBeep();
 
                 } else {
-                    // البحث عن طريق الموديل (بدون صورة بناءً على طلبك)
                     detailsTitle.innerHTML = `<i class="fa-solid fa-layer-group text-blue-400"></i> تفاصيل الموديل الرئيسي`;
                     itemCodeBadge.innerText = `Model: ${searchValue}`;
 
@@ -932,7 +977,7 @@
             fetchStockData();
         }
 
-        // 2. شاشة المبيعات التفاعلية
+        // 2. شاشة المبيعات التفاعلية مع جلب أسماء الموظفين والكميات المباعة
         async function fetchSalesData() {
             const totalContainer = document.getElementById('sales-total-val');
             const countContainer = document.getElementById('sales-count-val');
@@ -950,7 +995,7 @@
 
             totalContainer.innerText = "جاري الحساب...";
             countContainer.innerText = "...";
-            salesmenContainer.innerHTML = '<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري جلب الفواتير لفرعك عبر Server Script...</p>';
+            salesmenContainer.innerHTML = '<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري جلب الفواتير وأسماء الموظفين...</p>';
 
             try {
                 const response = await fetch(`${SERVER_URL}/api/method/get_branch_sales_summary`, {
@@ -970,24 +1015,44 @@
 
                 let branchInvoices = [...(resultMessage.pos || []), ...(resultMessage.sales || [])];
 
-                const totalSales = branchInvoices.reduce((acc, curr) => acc + (curr.grand_total || 0), 0);
-                totalContainer.innerText = `${totalSales.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} SAR`;
-                countContainer.innerText = branchInvoices.length;
-
                 const salesmenMap = {};
+                let validTotalSales = 0;
+                let validInvoicesCount = 0;
+
+                const EXCLUDED_SALESMEN = ['administrator', 'guest', 'apiuser@almousatrading.com', 'none', 'غير محدد'];
+
                 branchInvoices.forEach(inv => {
-                    const seller = inv.sales_partner || inv.owner || "غير محدد";
+                    let seller = inv.custom_sales_person || inv.sales_partner || inv.owner;
+
+                    if (!seller || seller.trim() === "" || seller === "-") {
+                        seller = "غير محدد";
+                    }
+
+                    const cleanSellerLower = seller.trim().toLowerCase();
+
+                    if (EXCLUDED_SALESMEN.includes(cleanSellerLower)) {
+                        return;
+                    }
+
+                    validTotalSales += (inv.grand_total || 0);
+                    validInvoicesCount += 1;
+
                     if (!salesmenMap[seller]) {
-                        salesmenMap[seller] = { count: 0, total: 0 };
+                        salesmenMap[seller] = { count: 0, total: 0, qty: 0 };
                     }
                     salesmenMap[seller].count += 1;
                     salesmenMap[seller].total += (inv.grand_total || 0);
+                    salesmenMap[seller].qty += (inv.total_qty || 0);
                 });
+
+                totalContainer.innerText = `${validTotalSales.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} SAR`;
+                countContainer.innerText = validInvoicesCount;
 
                 const sortedSalesmen = Object.keys(salesmenMap).map(key => ({
                     name: key,
                     count: salesmenMap[key].count,
-                    total: salesmenMap[key].total
+                    total: salesmenMap[key].total,
+                    qty: salesmenMap[key].qty
                 })).sort((a, b) => b.total - a.total);
 
                 if (sortedSalesmen.length > 0) {
@@ -997,8 +1062,9 @@
                             <thead class="bg-slate-800 text-white whitespace-nowrap">
                                 <tr>
                                     <th class="p-2.5 text-center w-12">الترتيب</th>
-                                    <th class="p-2.5">رجل المبيعات / Salesman</th>
+                                    <th class="p-2.5">اسم الموظف / Salesman</th>
                                     <th class="p-2.5 text-center">عدد الفواتير</th>
+                                    <th class="p-2.5 text-center">الكميات المباعة</th>
                                     <th class="p-2.5">إجمالي المبيعات</th>
                                 </tr>
                             </thead>
@@ -1018,9 +1084,10 @@
                                     <span class="px-2 py-0.5 rounded-lg text-[11px] font-black ${badgeColor}">${icon}</span>
                                 </td>
                                 <td class="p-2.5 font-bold text-slate-800 whitespace-nowrap">
-                                    <i class="fa-solid fa-user-tag text-indigo-500 ml-1"></i> ${sm.name}
+                                    <i class="fa-solid fa-user-tie text-indigo-500 ml-1"></i> ${sm.name}
                                 </td>
                                 <td class="p-2.5 text-center font-semibold text-slate-600 whitespace-nowrap">${sm.count}</td>
+                                <td class="p-2.5 text-center font-bold text-blue-600 whitespace-nowrap">${sm.qty} قطع</td>
                                 <td class="p-2.5 font-extrabold text-emerald-600 whitespace-nowrap">${sm.total.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} SAR</td>
                             </tr>
                         `;
@@ -1028,7 +1095,7 @@
 
                     salesmenContainer.innerHTML = html + `</tbody></table></div>`;
                 } else {
-                    salesmenContainer.innerHTML = '<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد مبيعات مسجلة لفرعك في هذه الفترة المحددة.</p>';
+                    salesmenContainer.innerHTML = '<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد مبيعات مسجلة لبائعي الفرع في هذه الفترة المحددة.</p>';
                 }
 
             } catch (err) {
@@ -1039,7 +1106,6 @@
             }
         }
 
-        // 3. التحويلات المعلقة
         async function fetchTransfersData() {
             const container = document.getElementById('transfers-results');
             container.innerHTML = '<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري تحميل البيانات...</p>';
@@ -1095,7 +1161,6 @@
             }
         }
 
-        // 4. طلبات المواد
         async function fetchRequestsData() {
             const container = document.getElementById('requests-results');
             container.innerHTML = '<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري تحميل البيانات...</p>';
