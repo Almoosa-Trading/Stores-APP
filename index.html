@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COLIN'S - بوابة خدمات الفروع | Branch Services</title>
+    <title>COLIN'S - Branch Services Portal</title>
     
     <!-- PWA Manifest & Theme Color -->
     <link rel="manifest" href="./manifest.json">
@@ -18,11 +18,11 @@
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <!-- مكتبة قراءة الباركود والـ UPC عبر الكاميرا Html5Qrcode -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Html5Qrcode Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>
-        body { font-family: 'Cairo', sans-serif; }
+        body { font-family: 'Inter', 'Cairo', sans-serif; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen flex flex-col justify-between text-slate-800">
@@ -30,25 +30,30 @@
     <!-- Header -->
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <!-- الشعار مع زر Home للعودة للرئيسية -->
             <div class="flex items-center gap-2 sm:gap-3">
-                <div onclick="navigateTo('dashboard')" title="الرئيسية / Home" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-3 py-1 rounded-lg tracking-wider text-base sm:text-lg cursor-pointer transition flex items-center gap-2 select-none active:scale-95">
+                <div onclick="navigateTo('dashboard')" title="Home" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-3 py-1 rounded-lg tracking-wider text-base sm:text-lg cursor-pointer transition flex items-center gap-2 select-none active:scale-95">
                     <i class="fa-solid fa-house text-sm"></i>
                     <span>COLIN'S</span>
                 </div>
-                <span id="header-branch-tag" class="text-[11px] sm:text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700 truncate max-w-[140px] sm:max-w-none">الفرع: لم يتم تحديد الفرع</span>
+                <span id="header-branch-tag" class="text-[11px] sm:text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700 truncate max-w-[140px] sm:max-w-none">Branch: Not Assigned</span>
             </div>
             
             <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Language Toggle Button -->
+                <button onclick="toggleLanguage()" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-slate-700 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-globe"></i>
+                    <span id="lang-btn-text">العربية</span>
+                </button>
+
                 <div class="text-left hidden md:block">
-                    <span id="user-display-name" class="text-sm font-bold block text-indigo-300">غير مسجل الدخول</span>
-                    <span id="user-branch-subtitle" class="text-[10px] text-slate-400 block">فريق المبيعات / Sales Team</span>
+                    <span id="user-display-name" class="text-sm font-bold block text-indigo-300">Not Logged In</span>
+                    <span id="user-branch-subtitle" class="text-[10px] text-slate-400 block" data-i18n="salesTeam">Sales Team</span>
                 </div>
                 <div class="w-8 h-8 sm:w-9 sm:h-9 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm">
                     <i class="fa-solid fa-user"></i>
                 </div>
                 <button id="logout-btn" onclick="handleLogout()" class="hidden text-xs bg-red-600/80 hover:bg-red-700 text-white px-2.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1">
-                    <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">خروج</span>
+                    <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline" data-i18n="logout">Logout</span>
                 </button>
             </div>
         </div>
@@ -60,35 +65,33 @@
         <!-- View 1: Dashboard -->
         <section id="view-dashboard" class="space-y-6">
             <div>
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-800">الخدمات السريعة / Quick Services</h1>
-                <p class="text-xs sm:text-sm text-slate-500">اختر القسم المطلوب للمتابعة والعمليات</p>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-800" data-i18n="quickServices">Quick Services</h1>
+                <p class="text-xs sm:text-sm text-slate-500" data-i18n="selectSection">Select the required section to proceed</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl">
-                <!-- الزر الأول: فحص المخزون -->
                 <div onclick="navigateTo('stock')" class="bg-white p-5 sm:p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group flex items-center gap-4 sm:gap-6">
                     <div class="w-16 h-16 sm:w-20 sm:h-20 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl group-hover:bg-blue-600 group-hover:text-white transition shrink-0">
                         <i class="fa-solid fa-barcode"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-0.5 sm:mb-1">فحص المخزون</h3>
-                        <p class="text-[11px] sm:text-xs text-slate-500">Stock Check & Barcode Search</p>
-                        <span class="inline-flex items-center text-xs font-bold text-blue-600 mt-2 sm:mt-3 group-hover:translate-x-1 transition">الدخول للفحص <i class="fa-solid fa-arrow-left mr-2"></i></span>
+                        <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-0.5 sm:mb-1" data-i18n="stockCheck">Stock Check</h3>
+                        <p class="text-[11px] sm:text-xs text-slate-500" data-i18n="stockCheckDesc">Stock Check & Barcode Search</p>
+                        <span class="inline-flex items-center text-xs font-bold text-blue-600 mt-2 sm:mt-3 group-hover:translate-x-1 transition"><span data-i18n="accessCheck">Open Check</span> <i class="fa-solid fa-arrow-right mx-1"></i></span>
                     </div>
                 </div>
 
-                <!-- الزر الثاني: عمليات الفروع -->
                 <div onclick="openAuthModal()" class="bg-white p-5 sm:p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group flex items-center gap-4 sm:gap-6">
                     <div class="w-16 h-16 sm:w-20 sm:h-20 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl group-hover:bg-indigo-600 group-hover:text-white transition shrink-0">
                         <i class="fa-solid fa-store"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-0.5 sm:mb-1">عمليات الفروع</h3>
-                            <span id="lock-badge" class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-shield-halved"></i> يتطلب دخول</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-800 mb-0.5 sm:mb-1" data-i18n="branchOperations">Branch Operations</h3>
+                            <span id="lock-badge" class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold"><i class="fa-solid fa-shield-halved"></i> <span data-i18n="requiresLogin">Requires Login</span></span>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-slate-500">Branch Operations & Analytics</p>
-                        <span class="inline-flex items-center text-xs font-bold text-indigo-600 mt-2 sm:mt-3 group-hover:translate-x-1 transition">عرض قائمة العمليات <i class="fa-solid fa-arrow-left mr-2"></i></span>
+                        <p class="text-[11px] sm:text-xs text-slate-500" data-i18n="branchOpsDesc">Branch Operations & Analytics</p>
+                        <span class="inline-flex items-center text-xs font-bold text-indigo-600 mt-2 sm:mt-3 group-hover:translate-x-1 transition"><span data-i18n="viewOperations">View Operations</span> <i class="fa-solid fa-arrow-right mx-1"></i></span>
                     </div>
                 </div>
             </div>
@@ -97,11 +100,11 @@
         <!-- View 1.5: Branch Operations Sub-menu -->
         <section id="view-branch-ops" class="hidden space-y-6">
             <button onclick="navigateTo('dashboard')" class="text-indigo-600 font-bold text-xs sm:text-sm flex items-center gap-2 mb-2 hover:underline">
-                <i class="fa-solid fa-arrow-right"></i> العودة للقائمة الرئيسية / Back to Main
+                <i class="fa-solid fa-arrow-right"></i> <span data-i18n="backToMain">Back to Main</span>
             </button>
             <div>
-                <h1 class="text-xl sm:text-2xl font-bold text-slate-800">🏪 عمليات الفروع / Branch Operations</h1>
-                <p class="text-xs sm:text-sm text-slate-500">اختر العملية المطلوبة لعرض التفاصيل والتقارير المخصصة لفرعك</p>
+                <h1 class="text-xl sm:text-2xl font-bold text-slate-800" data-i18n="branchOperationsTitle">🏪 Branch Operations</h1>
+                <p class="text-xs sm:text-sm text-slate-500" data-i18n="branchOpsSubDesc">Select the desired operation to view branch specific details and reports</p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
@@ -109,24 +112,24 @@
                     <div class="w-12 h-12 sm:w-14 sm:h-14 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 group-hover:bg-emerald-600 group-hover:text-white transition">
                         <i class="fa-solid fa-chart-line"></i>
                     </div>
-                    <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-1">الاطلاع على المبيعات</h3>
-                    <p class="text-xs text-slate-500">Branch Sales Analytics</p>
+                    <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-1" data-i18n="salesAnalytics">Sales Analytics</h3>
+                    <p class="text-xs text-slate-500" data-i18n="salesAnalyticsDesc">Branch Sales Analytics & Performance</p>
                 </div>
 
                 <div onclick="navigateTo('transfers')" class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group">
                     <div class="w-12 h-12 sm:w-14 sm:h-14 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 group-hover:bg-amber-600 group-hover:text-white transition">
                         <i class="fa-solid fa-boxes-packing"></i>
                     </div>
-                    <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-1">التحويلات المعلقة</h3>
-                    <p class="text-xs text-slate-500">Pending Transfers (In/Out)</p>
+                    <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-1" data-i18n="pendingTransfers">Pending Transfers</h3>
+                    <p class="text-xs text-slate-500" data-i18n="pendingTransfersDesc">Pending Transfers (In/Out)</p>
                 </div>
 
                 <div onclick="navigateTo('requests')" class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-200 cursor-pointer group">
                     <div class="w-12 h-12 sm:w-14 sm:h-14 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 group-hover:bg-purple-600 group-hover:text-white transition">
                         <i class="fa-solid fa-clipboard-check"></i>
                     </div>
-                    <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-1">طلبات المواد</h3>
-                    <p class="text-xs text-slate-500">Material Requests Status</p>
+                    <h3 class="text-base sm:text-lg font-bold text-slate-800 mb-1" data-i18n="materialRequests">Material Requests</h3>
+                    <p class="text-xs text-slate-500" data-i18n="materialRequestsDesc">Material Requests Status</p>
                 </div>
             </div>
         </section>
@@ -134,72 +137,67 @@
         <!-- View 2: Stock Check -->
         <section id="view-stock" class="hidden space-y-4">
             <button onclick="navigateTo('dashboard')" class="text-indigo-600 font-bold text-xs sm:text-sm flex items-center gap-2 mb-2 hover:underline">
-                <i class="fa-solid fa-arrow-right"></i> العودة للقائمة الرئيسية / Back to Main
+                <i class="fa-solid fa-arrow-right"></i> <span data-i18n="backToMain">Back to Main</span>
             </button>
             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                 <h2 class="text-base sm:text-xl font-bold text-slate-800 flex items-center gap-2">
-                    🔍 فحص المخزون والباركود / Stock Check
+                    🔍 <span data-i18n="stockCheckTitle">Stock Check & Barcode Search</span>
                 </h2>
 
-                <!-- خيارات نوع البحث -->
                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 space-y-1.5 sm:space-y-0 sm:flex sm:items-center sm:gap-4">
-                    <span class="text-slate-500 font-bold block sm:inline">طريقة البحث:</span>
+                    <span class="text-slate-500 font-bold block sm:inline" data-i18n="searchMethod">Search Method:</span>
                     <div class="flex items-center justify-between sm:justify-start gap-2">
                         <label class="flex items-center gap-1 cursor-pointer bg-white sm:bg-transparent px-2 py-1 sm:p-0 rounded-lg border sm:border-0 border-slate-200 flex-1 sm:flex-none justify-center">
                             <input type="radio" name="search_type" value="item" checked onchange="updateSearchPlaceholder()" class="w-3.5 h-3.5 text-indigo-600 focus:ring-indigo-500">
-                            <span class="whitespace-nowrap text-[11px] sm:text-xs">رقم المنتج / UPC</span>
+                            <span class="whitespace-nowrap text-[11px] sm:text-xs" data-i18n="itemCodeUpc">Item Code / UPC</span>
                         </label>
                         <label class="flex items-center gap-1 cursor-pointer bg-white sm:bg-transparent px-2 py-1 sm:p-0 rounded-lg border sm:border-0 border-slate-200 flex-1 sm:flex-none justify-center">
                             <input type="radio" name="search_type" value="model" onchange="updateSearchPlaceholder()" class="w-3.5 h-3.5 text-indigo-600 focus:ring-indigo-500">
-                            <span class="whitespace-nowrap text-[11px] sm:text-xs">الموديل (Model)</span>
+                            <span class="whitespace-nowrap text-[11px] sm:text-xs" data-i18n="modelName">Model</span>
                         </label>
                     </div>
                 </div>
 
-                <!-- شريط البحث مع زر الكاميرا -->
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="stock-search-input" onkeypress="handleKeyPress(event)" placeholder="أدخل كود المنتج، الباركود، أو رقم الـ UPC..." class="flex-grow border border-slate-300 px-3.5 py-2 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="stock-search-input" onkeypress="handleKeyPress(event)" placeholder="Enter item code, barcode or UPC..." class="flex-grow border border-slate-300 px-3.5 py-2 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     <div class="flex gap-2">
                         <button onclick="toggleScanner()" class="flex-1 sm:flex-none bg-emerald-600 text-white px-3.5 py-2 rounded-xl font-bold text-xs hover:bg-emerald-700 transition flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-camera"></i> المسح بالكاميرا
+                            <i class="fa-solid fa-camera"></i> <span data-i18n="cameraScan">Camera Scan</span>
                         </button>
                         <button onclick="fetchStockData()" class="flex-1 sm:flex-none bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold text-xs hover:bg-indigo-700 transition flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-magnifying-glass"></i> بحث
+                            <i class="fa-solid fa-magnifying-glass"></i> <span data-i18n="searchBtn">Search</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- حاوية كاميرا مسح الباركود -->
                 <div id="scanner-container-box" class="hidden bg-slate-900 p-4 rounded-2xl border border-slate-700 text-center space-y-3">
                     <div class="flex justify-between items-center text-white px-2">
-                        <span class="text-xs font-bold"><i class="fa-solid fa-camera text-emerald-400"></i> وجّه الكاميرا نحو الباركود أو الـ UPC</span>
-                        <button onclick="toggleScanner()" class="text-red-400 hover:text-red-300 text-xs font-bold"><i class="fa-solid fa-xmark"></i> إغلاق</button>
+                        <span class="text-xs font-bold"><i class="fa-solid fa-camera text-emerald-400"></i> <span data-i18n="pointCamera">Point camera at barcode or UPC</span></span>
+                        <button onclick="toggleScanner()" class="text-red-400 hover:text-red-300 text-xs font-bold"><i class="fa-solid fa-xmark"></i> <span data-i18n="close">Close</span></button>
                     </div>
                     <div id="reader" class="w-full max-w-md mx-auto overflow-hidden rounded-xl"></div>
                 </div>
 
-                <!-- صندوق تفاصيل المنتج -->
                 <div id="stock-details" class="hidden my-3 p-3.5 sm:p-5 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl shadow-lg border border-blue-700/50 space-y-3">
                     <div class="flex items-center justify-between border-b border-blue-700/50 pb-2.5">
                         <h3 class="text-xs sm:text-base font-bold flex items-center gap-1.5 text-blue-200" id="details-title">
-                            <i class="fa-solid fa-box-open text-blue-400"></i> تفاصيل المنتج الأساسية
+                            <i class="fa-solid fa-box-open text-blue-400"></i> <span data-i18n="productDetails">Product Basic Details</span>
                         </h3>
                         <span id="item-code-badge" class="bg-blue-800/80 text-blue-200 text-[11px] sm:text-xs px-2 py-0.5 rounded-full font-mono font-semibold border border-blue-600"></span>
                     </div>
 
-                    <!-- حاوية الشبكة -->
                     <div class="grid grid-cols-2 gap-2" id="item-info-grid"></div>
 
                     <div id="item-variants-container" class="hidden pt-2.5 border-t border-blue-700/50">
                         <span class="text-blue-300 block text-[11px] mb-2 font-semibold">
-                            <i class="fa-solid fa-layer-group text-blue-400"></i> المقاسات والألوان المتاحة لهذا الموديل (Variants):
+                            <i class="fa-solid fa-layer-group text-blue-400"></i> <span data-i18n="availableVariants">Available Variants for this Model:</span>
                         </span>
                         <div id="item-variants-list" class="flex flex-wrap gap-1.5"></div>
                     </div>
                 </div>
 
                 <div id="stock-results" class="mt-4 overflow-x-auto">
-                    <p class="text-slate-400 text-xs sm:text-sm">أدخل كود المنتج أو الـ UPC أو امسحه بالكاميرا لعرض تفاصيل المنتج ورصيد الفروع.</p>
+                    <p class="text-slate-400 text-xs sm:text-sm" data-i18n="stockPrompt">Enter item code, UPC or scan it with camera to view product details and branch balances.</p>
                 </div>
             </div>
         </section>
@@ -207,50 +205,49 @@
         <!-- View 3: Sales -->
         <section id="view-sales" class="hidden space-y-4">
             <button onclick="navigateTo('branch-ops')" class="text-indigo-600 font-bold text-xs sm:text-sm flex items-center gap-2 mb-2 hover:underline">
-                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة عمليات الفروع / Back to Operations
+                <i class="fa-solid fa-arrow-right"></i> <span data-i18n="backToOperations">Back to Operations</span>
             </button>
             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-4">
                     <div>
-                        <h2 class="text-lg sm:text-xl font-bold text-slate-800">📊 ملخص مبيعات الفرع / Sales Analytics</h2>
-                        <p id="sales-branch-name-subtitle" class="text-xs text-indigo-600 font-semibold mt-0.5">الفرع المحدد: -</p>
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-800" data-i18n="salesAnalyticsTitle">📊 Branch Sales Analytics</h2>
+                        <p id="sales-branch-name-subtitle" class="text-xs text-indigo-600 font-semibold mt-0.5">Assigned Branch: -</p>
                     </div>
 
-                    <!-- شريط التواريخ مع فلتر المواعيد السريعة -->
                     <div class="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 w-full sm:w-auto">
                         <div class="flex items-center gap-1 text-xs font-bold text-slate-600">
                             <i class="fa-solid fa-calendar-check text-indigo-600"></i>
                             <select id="sales-preset-select" onchange="setSalesDateRange(this.value)" class="bg-white border border-slate-300 px-2 py-1 rounded-lg text-xs font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                                <option value="month">هذا الشهر</option>
-                                <option value="today">اليوم</option>
-                                <option value="yesterday">أمس</option>
-                                <option value="week">هذا الأسبوع</option>
-                                <option value="year">هذه السنة</option>
+                                <option value="month" data-i18n="optMonth">This Month</option>
+                                <option value="today" data-i18n="optToday">Today</option>
+                                <option value="yesterday" data-i18n="optYesterday">Yesterday</option>
+                                <option value="week" data-i18n="optWeek">This Week</option>
+                                <option value="year" data-i18n="optYear">This Year</option>
                             </select>
                         </div>
 
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-                            <span>من:</span>
+                            <span data-i18n="fromDate">From:</span>
                             <input type="date" id="sales-from-date" class="bg-white border border-slate-300 px-2 py-1 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-                            <span>إلى:</span>
+                            <span data-i18n="toDate">To:</span>
                             <input type="date" id="sales-to-date" class="bg-white border border-slate-300 px-2 py-1 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <button onclick="fetchSalesData()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 mr-auto sm:mr-0">
-                            <i class="fa-solid fa-filter"></i> تطبيق
+                            <i class="fa-solid fa-filter"></i> <span data-i18n="applyFilter">Apply</span>
                         </button>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="p-4 sm:p-5 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-2xl shadow-md">
-                        <p class="text-xs text-emerald-100 font-bold mb-1">إجمالي المبيعات المكتملة للفترة</p>
-                        <p id="sales-total-val" class="text-2xl sm:text-3xl font-black">جاري الحساب...</p>
+                        <p class="text-xs text-emerald-100 font-bold mb-1" data-i18n="totalSalesPeriod">Total Completed Sales for Period</p>
+                        <p id="sales-total-val" class="text-2xl sm:text-3xl font-black">Calculating...</p>
                     </div>
                     <div class="p-4 sm:p-5 bg-slate-800 text-white rounded-2xl shadow-md flex items-center justify-between">
                         <div>
-                            <p class="text-xs text-slate-400 font-bold mb-1">عدد الفواتير المكتملة</p>
+                            <p class="text-xs text-slate-400 font-bold mb-1" data-i18n="completedInvoicesCount">Completed Invoices Count</p>
                             <p id="sales-count-val" class="text-2xl sm:text-3xl font-black text-amber-400">-</p>
                         </div>
                         <div class="w-10 h-10 sm:w-12 sm:h-12 bg-slate-700 rounded-xl flex items-center justify-center text-xl sm:text-2xl text-amber-400">
@@ -261,10 +258,10 @@
 
                 <div class="space-y-3 pt-2">
                     <h3 class="text-sm sm:text-md font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-trophy text-amber-500"></i> ترتيب رجال المبيعات (Salesmen Ranking)
+                        <i class="fa-solid fa-trophy text-amber-500"></i> <span data-i18n="salesmenRanking">Salesmen Ranking</span>
                     </h3>
                     <div id="salesmen-results" class="overflow-x-auto">
-                        <p class="text-slate-400 text-xs sm:text-sm">اختر النطاق الزمني واضغط تطبيق الفلتر لعرض الترتيب.</p>
+                        <p class="text-slate-400 text-xs sm:text-sm" data-i18n="salesPrompt">Select date range and click Apply Filter to view ranking.</p>
                     </div>
                 </div>
             </div>
@@ -273,12 +270,12 @@
         <!-- View 4: Transfers -->
         <section id="view-transfers" class="hidden space-y-4">
             <button onclick="navigateTo('branch-ops')" class="text-indigo-600 font-bold text-xs sm:text-sm flex items-center gap-2 mb-2 hover:underline">
-                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة عمليات الفروع / Back to Operations
+                <i class="fa-solid fa-arrow-right"></i> <span data-i18n="backToOperations">Back to Operations</span>
             </button>
             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-lg sm:text-xl font-bold text-slate-800">🔄 التحويلات المعلقة / Pending Transfers</h2>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800" data-i18n="pendingTransfersTitle">🔄 Pending Transfers</h2>
                 <div id="transfers-results" class="overflow-x-auto">
-                    <p class="text-slate-400 text-xs sm:text-sm">جاري جلب أذون التحويل المعلقة...</p>
+                    <p class="text-slate-400 text-xs sm:text-sm" data-i18n="loadingTransfers">Fetching pending transfer vouchers...</p>
                 </div>
             </div>
         </section>
@@ -286,19 +283,19 @@
         <!-- View 5: Requests -->
         <section id="view-requests" class="hidden space-y-4">
             <button onclick="navigateTo('branch-ops')" class="text-indigo-600 font-bold text-xs sm:text-sm flex items-center gap-2 mb-2 hover:underline">
-                <i class="fa-solid fa-arrow-right"></i> العودة لقائمة عمليات الفروع / Back to Operations
+                <i class="fa-solid fa-arrow-right"></i> <span data-i18n="backToOperations">Back to Operations</span>
             </button>
             <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                <h2 class="text-lg sm:text-xl font-bold text-slate-800">📋 حالات طلبات المواد / Material Requests</h2>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800" data-i18n="materialRequestsTitle">📋 Material Requests Status</h2>
                 <div id="requests-results" class="overflow-x-auto">
-                    <p class="text-slate-400 text-xs sm:text-sm">جاري تحميل طلبات المواد...</p>
+                    <p class="text-slate-400 text-xs sm:text-sm" data-i18n="loadingRequests">Loading material requests...</p>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Modal: نافذة تسجيل الدخول -->
+    <!-- Modal: Login -->
     <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden transform transition-all">
             <div class="bg-slate-900 text-white p-4 sm:p-5 flex justify-between items-center">
@@ -307,8 +304,8 @@
                         <i class="fa-solid fa-lock text-white text-sm"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-sm sm:text-base">مصادقة ERPNext / Authentication</h3>
-                        <p class="text-[10px] sm:text-[11px] text-slate-400">أدخل معلومات حسابك للوصول لعمليات الفروع</p>
+                        <h3 class="font-bold text-sm sm:text-base" data-i18n="authTitle">ERPNext Authentication</h3>
+                        <p class="text-[10px] sm:text-[11px] text-slate-400" data-i18n="authSubtitle">Enter account credentials to access branch operations</p>
                     </div>
                 </div>
                 <button onclick="closeAuthModal()" class="text-slate-400 hover:text-white transition">
@@ -320,15 +317,15 @@
                 <div id="auth-error-msg" class="hidden p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-semibold"></div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني / ERPNext Email:</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1" data-i18n="emailLabel">ERPNext Email:</label>
                     <div class="relative">
                         <i class="fa-solid fa-envelope absolute right-3 top-3 text-slate-400 text-sm"></i>
-                        <input type="text" id="login-email" required placeholder="مثال: 001a@almoosa.com.sa" class="w-full pr-9 pl-3 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="login-email" required placeholder="e.g. 001a@almoosa.com.sa" class="w-full pr-9 pl-3 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">كلمة المرور / Password:</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1" data-i18n="passwordLabel">Password:</label>
                     <div class="relative">
                         <i class="fa-solid fa-key absolute right-3 top-3 text-slate-400 text-sm"></i>
                         <input type="password" id="login-password" required placeholder="••••••••" class="w-full pr-9 pl-3 py-2 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -337,10 +334,10 @@
 
                 <div class="pt-2 flex gap-3">
                     <button type="submit" id="login-btn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition text-xs sm:text-sm flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول / Login
+                        <i class="fa-solid fa-right-to-bracket"></i> <span data-i18n="loginBtn">Login</span>
                     </button>
-                    <button type="button" onclick="closeAuthModal()" class="px-4 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-bold text-xs sm:text-sm hover:bg-slate-50 transition">
-                        إلغاء
+                    <button type="button" onclick="closeAuthModal()" class="px-4 py-2.5 border border-slate-300 text-slate-600 rounded-xl font-bold text-xs sm:text-sm hover:bg-slate-50 transition" data-i18n="cancel">
+                        Cancel
                     </button>
                 </div>
             </form>
@@ -382,6 +379,174 @@
             "036": { code: "036", name: "Lacali Damam", warehouse: "036" },
             "037": { code: "037", name: "Lacali Al mahmal", warehouse: "037" }
         };
+
+        const translations = {
+            en: {
+                salesTeam: "Sales Team",
+                logout: "Logout",
+                quickServices: "Quick Services",
+                selectSection: "Select the required section to proceed",
+                stockCheck: "Stock Check",
+                stockCheckDesc: "Stock Check & Barcode Search",
+                accessCheck: "Open Check",
+                branchOperations: "Branch Operations",
+                requiresLogin: "Requires Login",
+                branchOpsDesc: "Branch Operations & Analytics",
+                viewOperations: "View Operations",
+                backToMain: "Back to Main",
+                branchOperationsTitle: "🏪 Branch Operations",
+                branchOpsSubDesc: "Select the desired operation to view branch specific details and reports",
+                salesAnalytics: "Sales Analytics",
+                salesAnalyticsDesc: "Branch Sales Analytics & Performance",
+                pendingTransfers: "Pending Transfers",
+                pendingTransfersDesc: "Pending Transfers (In/Out)",
+                materialRequests: "Material Requests",
+                materialRequestsDesc: "Material Requests Status",
+                stockCheckTitle: "Stock Check & Barcode Search",
+                searchMethod: "Search Method:",
+                itemCodeUpc: "Item Code / UPC",
+                modelName: "Model",
+                cameraScan: "Camera Scan",
+                searchBtn: "Search",
+                pointCamera: "Point camera at barcode or UPC",
+                close: "Close",
+                productDetails: "Product Basic Details",
+                availableVariants: "Available Variants for this Model:",
+                stockPrompt: "Enter item code, UPC or scan it with camera to view product details and branch balances.",
+                backToOperations: "Back to Operations",
+                salesAnalyticsTitle: "📊 Branch Sales Analytics",
+                optMonth: "This Month",
+                optToday: "Today",
+                optYesterday: "Yesterday",
+                optWeek: "This Week",
+                optYear: "This Year",
+                fromDate: "From:",
+                toDate: "To:",
+                applyFilter: "Apply",
+                totalSalesPeriod: "Total Completed Sales for Period",
+                completedInvoicesCount: "Completed Invoices Count",
+                salesmenRanking: "Salesmen Ranking",
+                salesPrompt: "Select date range and click Apply Filter to view ranking.",
+                pendingTransfersTitle: "🔄 Pending Transfers",
+                loadingTransfers: "Fetching pending transfer vouchers...",
+                materialRequestsTitle: "📋 Material Requests Status",
+                loadingRequests: "Loading material requests...",
+                authTitle: "ERPNext Authentication",
+                authSubtitle: "Enter account credentials to access branch operations",
+                emailLabel: "ERPNext Email:",
+                passwordLabel: "Password:",
+                loginBtn: "Login",
+                cancel: "Cancel",
+                notLoggedIn: "Not Logged In",
+                branchNotAssigned: "Branch: Not Assigned",
+                availableBadge: "Available"
+            },
+            ar: {
+                salesTeam: "فريق المبيعات",
+                logout: "خروج",
+                quickServices: "الخدمات السريعة",
+                selectSection: "اختر القسم المطلوب للمتابعة والعمليات",
+                stockCheck: "فحص المخزون",
+                stockCheckDesc: "فحص المخزون والبحث بالباركود",
+                accessCheck: "الدخول للفحص",
+                branchOperations: "عمليات الفروع",
+                requiresLogin: "يتطلب دخول",
+                branchOpsDesc: "التحليلات وعمليات الفروع",
+                viewOperations: "عرض قائمة العمليات",
+                backToMain: "العودة للقائمة الرئيسية",
+                branchOperationsTitle: "🏪 عمليات الفروع",
+                branchOpsSubDesc: "اختر العملية المطلوبة لعرض التفاصيل والتقارير المخصصة لفرعك",
+                salesAnalytics: "الاطلاع على المبيعات",
+                salesAnalyticsDesc: "تحليلات مبيعات الفرع والأداء",
+                pendingTransfers: "التحويلات المعلقة",
+                pendingTransfersDesc: "أذون التحويل المعلقة (صادر/وارد)",
+                materialRequests: "طلبات المواد",
+                materialRequestsDesc: "حالة طلبات المواد للمستودعات",
+                stockCheckTitle: "فحص المخزون والباركود",
+                searchMethod: "طريقة البحث:",
+                itemCodeUpc: "كود المنتج / UPC",
+                modelName: "الموديل (Model)",
+                cameraScan: "المسح بالكاميرا",
+                searchBtn: "بحث",
+                pointCamera: "وجّه الكاميرا نحو الباركود أو الـ UPC",
+                close: "إغلاق",
+                productDetails: "تفاصيل المنتج الأساسية",
+                availableVariants: "المقاسات والألوان المتاحة لهذا الموديل:",
+                stockPrompt: "أدخل كود المنتج أو الـ UPC أو امسحه بالكاميرا لعرض تفاصيل المنتج ورصيد الفروع.",
+                backToOperations: "العودة لقائمة عمليات الفروع",
+                salesAnalyticsTitle: "📊 ملخص مبيعات الفرع",
+                optMonth: "هذا الشهر",
+                optToday: "اليوم",
+                optYesterday: "أمس",
+                optWeek: "هذا الأسبوع",
+                optYear: "هذه السنة",
+                fromDate: "من:",
+                toDate: "إلى:",
+                applyFilter: "تطبيق",
+                totalSalesPeriod: "إجمالي المبيعات المكتملة للفترة",
+                completedInvoicesCount: "عدد الفواتير المكتملة",
+                salesmenRanking: "ترتيب رجال المبيعات",
+                salesPrompt: "اختر النطاق الزمني واضغط تطبيق الفلتر لعرض الترتيب.",
+                pendingTransfersTitle: "🔄 التحويلات المعلقة",
+                loadingTransfers: "جاري جلب أذون التحويل المعلقة...",
+                materialRequestsTitle: "📋 حالات طلبات المواد",
+                loadingRequests: "جاري تحميل طلبات المواد...",
+                authTitle: "مصادقة ERPNext",
+                authSubtitle: "أدخل معلومات حسابك للوصول لعمليات الفروع",
+                emailLabel: "البريد الإلكتروني:",
+                passwordLabel: "كلمة المرور:",
+                loginBtn: "تسجيل الدخول",
+                cancel: "إلغاء",
+                notLoggedIn: "غير مسجل الدخول",
+                branchNotAssigned: "الفرع: لم يتم تحديد الفرع",
+                availableBadge: "متاح"
+            }
+        };
+
+        let currentLang = localStorage.getItem('app_lang') || 'en';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            localStorage.setItem('app_lang', currentLang);
+            applyLanguage();
+            
+            // إعادة رسم المبيعات أو القوائم الحالية لترجمة الجداول ديناميكياً
+            const salesView = document.getElementById('view-sales');
+            if (salesView && !salesView.classList.contains('hidden')) {
+                fetchSalesData();
+            }
+        }
+
+        function applyLanguage() {
+            const htmlRoot = document.getElementById('html-root');
+            const langBtnText = document.getElementById('lang-btn-text');
+
+            if (currentLang === 'ar') {
+                htmlRoot.setAttribute('lang', 'ar');
+                htmlRoot.setAttribute('dir', 'rtl');
+                langBtnText.innerText = 'English';
+            } else {
+                htmlRoot.setAttribute('lang', 'en');
+                htmlRoot.setAttribute('dir', 'ltr');
+                langBtnText.innerText = 'العربية';
+            }
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    el.innerText = translations[currentLang][key];
+                }
+            });
+
+            const stockInput = document.getElementById('stock-search-input');
+            if (stockInput) {
+                stockInput.placeholder = currentLang === 'ar' ? "أدخل كود المنتج، الباركود، أو رقم الـ UPC..." : "Enter item code, barcode or UPC...";
+            }
+            const loginEmailInput = document.getElementById('login-email');
+            if (loginEmailInput) {
+                loginEmailInput.placeholder = currentLang === 'ar' ? "مثال: 001a@almoosa.com.sa" : "e.g. 001a@almoosa.com.sa";
+            }
+        }
 
         let currentAbortController = null;
         let isAuthenticatedUser = false;
@@ -457,6 +622,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
+            applyLanguage();
             setSalesDateRange('month');
             checkSavedSession();
         });
@@ -531,7 +697,7 @@
                 ).then(() => {
                     isScannerRunning = true;
                 }).catch(err => {
-                    alert("تعذر تشغيل الكاميرا، يرجى التأكد من منح الإذن للمتصفح.");
+                    alert(currentLang === 'ar' ? "تعذر تشغيل الكاميرا، يرجى التأكد من منح الإذن للمتصفح." : "Failed to start camera. Please ensure permissions are granted.");
                     box.classList.add('hidden');
                     isScannerRunning = false;
                 });
@@ -580,23 +746,23 @@
                 const displayTitle = branchName || info.name;
 
                 nameEl.innerText = displayTitle;
-                branchTagEl.innerText = `الفرع: ${displayTitle}`;
+                branchTagEl.innerText = `Branch: ${displayTitle}`;
                 branchTagEl.classList.remove('bg-slate-800', 'text-slate-300');
                 branchTagEl.classList.add('bg-indigo-900', 'text-indigo-200', 'border-indigo-600');
                 
                 if (lockBadgeEl) {
-                    lockBadgeEl.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> متاح';
+                    lockBadgeEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> ${translations[currentLang].availableBadge}`;
                     lockBadgeEl.className = 'text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold';
                 }
                 logoutBtn.classList.remove('hidden');
             } else {
-                nameEl.innerText = "غير مسجل الدخول";
-                branchTagEl.innerText = "الفرع: لم يتم تحديد الفرع";
+                nameEl.innerText = translations[currentLang].notLoggedIn;
+                branchTagEl.innerText = translations[currentLang].branchNotAssigned;
                 branchTagEl.classList.remove('bg-indigo-900', 'text-indigo-200', 'border-indigo-600');
                 branchTagEl.classList.add('bg-slate-800', 'text-slate-300');
 
                 if (lockBadgeEl) {
-                    lockBadgeEl.innerHTML = '<i class="fa-solid fa-shield-halved"></i> يتطلب دخول';
+                    lockBadgeEl.innerHTML = `<i class="fa-solid fa-shield-halved"></i> ${translations[currentLang].requiresLogin}`;
                     lockBadgeEl.className = 'text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md font-bold';
                 }
                 logoutBtn.classList.add('hidden');
@@ -651,7 +817,7 @@
             const loginBtn = document.getElementById('login-btn');
 
             errorMsg.classList.add('hidden');
-            loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التحقق...';
+            loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verifying...';
             loginBtn.disabled = true;
 
             try {
@@ -678,15 +844,15 @@
                     closeAuthModal();
                     navigateTo('branch-ops');
                 } else {
-                    errorMsg.innerText = "البريد الإلكتروني أو كلمة المرور غير صحيحة على ERPNext.";
+                    errorMsg.innerText = currentLang === 'ar' ? "البريد الإلكتروني أو كلمة المرور غير صحيحة على ERPNext." : "Invalid email or password on ERPNext.";
                     errorMsg.classList.remove('hidden');
                 }
             } catch (err) {
                 console.error("Login Error:", err);
-                errorMsg.innerText = "تعذر الاتصال بسيرفر ERPNext. يرجى التأكد من الشابكة/الربط.";
+                errorMsg.innerText = currentLang === 'ar' ? "تعذر الاتصال بسيرفر ERPNext." : "Could not connect to ERPNext server.";
                 errorMsg.classList.remove('hidden');
             } finally {
-                loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول / Login';
+                loginBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i> ${translations[currentLang].loginBtn}`;
                 loginBtn.disabled = false;
             }
         }
@@ -695,9 +861,9 @@
             const searchType = document.querySelector('input[name="search_type"]:checked').value;
             const input = document.getElementById('stock-search-input');
             if (searchType === 'item') {
-                input.placeholder = "أدخل كود المنتج، الباركود، أو رقم الـ UPC...";
+                input.placeholder = currentLang === 'ar' ? "أدخل كود المنتج، الباركود، أو رقم الـ UPC..." : "Enter item code, barcode or UPC...";
             } else {
-                input.placeholder = "أدخل اسم الموديل Model (مثال: 1065219)...";
+                input.placeholder = currentLang === 'ar' ? "أدخل اسم الموديل Model..." : "Enter Model name (e.g. 1065219)...";
             }
         }
 
@@ -738,9 +904,9 @@
             const variantsContainer = document.getElementById('item-variants-container');
             const variantsList = document.getElementById('item-variants-list');
 
-            if (!searchValue) return alert('برجاء إدخال قيمة البحث / Please enter a search value');
+            if (!searchValue) return alert(currentLang === 'ar' ? 'برجاء إدخال قيمة البحث' : 'Please enter a search value');
 
-            container.innerHTML = '<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري البحث عن الصنف أو الـ UPC...</p>';
+            container.innerHTML = `<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>${currentLang === 'ar' ? 'جاري البحث...' : 'Searching item or UPC...'}</p>`;
             detailsBox.classList.add('hidden');
             infoGrid.innerHTML = '';
             variantsContainer.classList.add('hidden');
@@ -779,7 +945,7 @@
                     }
 
                     if (!item) {
-                        container.innerHTML = '<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لم يتم العثور على الصنف المطلوب باستخدام كود المنتج أو الـ UPC أو الباركود المدخل.</p>';
+                        container.innerHTML = `<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">${currentLang === 'ar' ? 'لم يتم العثور على الصنف المطلوب.' : 'Item not found using entered code or UPC.'}</p>`;
                         return;
                     }
 
@@ -816,7 +982,7 @@
                         if (parts.length >= 4) subGroupVal = parts[3];
                     }
 
-                    detailsTitle.innerHTML = `<i class="fa-solid fa-box-open text-blue-400"></i> تفاصيل المنتج الأساسية`;
+                    detailsTitle.innerHTML = `<i class="fa-solid fa-box-open text-blue-400"></i> ${currentLang === 'ar' ? 'تفاصيل المنتج الأساسية' : 'Product Basic Details'}`;
                     itemCodeBadge.innerText = realItemCode;
 
                     const brandVal = item.brand || "COLIN'S";
@@ -835,49 +1001,49 @@
                     infoGrid.innerHTML = `
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner col-span-2 flex flex-col items-center justify-center space-y-2">
                             <span class="text-blue-300 block text-[11px] font-semibold">
-                                <i class="fa-solid fa-image text-cyan-400"></i> صورة المنتج (انقر للفتح/التحميل)
+                                <i class="fa-solid fa-image text-cyan-400"></i> ${currentLang === 'ar' ? 'صورة المنتج (انقر للفتح/التحميل)' : 'Product Image (Click to open/download)'}
                             </span>
                             <a href="${originalUrl}" target="_blank" download="${baseImageName}.jpg" class="w-32 h-32 sm:w-40 sm:h-40 bg-slate-900 rounded-lg overflow-hidden border border-blue-600 hover:border-cyan-400 transition flex items-center justify-center p-0.5 group relative">
                                 <img src="${proxyImageUrl}" alt="Product Image" class="w-full h-full object-cover rounded group-hover:scale-105 transition duration-200" onerror="handleImageError(this, '${cleanModel}', '${pureColor}')">
                                 <div class="absolute inset-0 bg-blue-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold gap-1">
-                                    <i class="fa-solid fa-download"></i> تحميل
+                                    <i class="fa-solid fa-download"></i> ${currentLang === 'ar' ? 'تحميل' : 'Download'}
                                 </div>
                             </a>
                         </div>
 
                         <div onclick="searchByModel('${variantOfVal}')" class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner col-span-2 sm:col-span-1 cursor-pointer hover:border-cyan-400 hover:bg-blue-900 transition">
                             <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold flex items-center justify-between">
-                                <span><i class="fa-solid fa-diagram-project text-amber-400"></i> الموديل / Variant Of</span>
+                                <span><i class="fa-solid fa-diagram-project text-amber-400"></i> Model / Variant Of</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-cyan-300"></i>
                             </span>
                             <span class="font-extrabold text-amber-300 text-xs sm:text-sm font-mono break-all underline decoration-dotted">${variantOfVal}</span>
                         </div>
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner">
-                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-venus-mars text-blue-400"></i> النوع / Gender</span>
+                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-venus-mars text-blue-400"></i> Gender</span>
                             <span class="font-bold text-white text-xs break-all">${genderVal}</span>
                         </div>
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner">
-                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-layer-group text-blue-400"></i> الفئة / Category</span>
+                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-layer-group text-blue-400"></i> Category</span>
                             <span class="font-bold text-white text-xs break-all">${categoryVal}</span>
                         </div>
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner">
-                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-folder text-blue-400"></i> المجموعة / Group</span>
+                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-folder text-blue-400"></i> Group</span>
                             <span class="font-bold text-white text-xs break-all">${groupVal}</span>
                         </div>
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner">
-                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-list-check text-blue-400"></i> الفرعية / Sub Group</span>
+                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-list-check text-blue-400"></i> Sub Group</span>
                             <span class="font-bold text-white text-xs break-all">${subGroupVal}</span>
                         </div>
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner">
-                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-palette text-blue-400"></i> اللون / Color</span>
+                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-palette text-blue-400"></i> Color</span>
                             <span class="font-extrabold text-cyan-300 text-xs break-all">${colorVal}</span>
                         </div>
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner">
-                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-ruler-combined text-blue-400"></i> المقاس / Size</span>
+                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-ruler-combined text-blue-400"></i> Size</span>
                             <span class="font-extrabold text-cyan-300 text-xs break-all">${sizeVal}</span>
                         </div>
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner">
-                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-copyright text-blue-400"></i> البراند / Brand</span>
+                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-copyright text-blue-400"></i> Brand</span>
                             <span class="font-bold text-white text-xs break-all">${brandVal}</span>
                         </div>
                     `;
@@ -893,7 +1059,7 @@
                         <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
                             <table class="w-full text-xs text-right bg-white">
                                 <thead class="bg-slate-800 text-white whitespace-nowrap">
-                                    <tr><th class="p-2.5">المستودع / الفرع</th><th class="p-2.5">الرصيد المتاح</th></tr>
+                                    <tr><th class="p-2.5">${currentLang === 'ar' ? 'المستودع / الفرع' : 'Warehouse / Branch'}</th><th class="p-2.5">${currentLang === 'ar' ? 'الرصيد المتاح' : 'Available Qty'}</th></tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">`;
                         binJson.data.forEach(row => {
@@ -901,18 +1067,18 @@
                         });
                         container.innerHTML = html + `</tbody></table></div>`;
                     } else {
-                        container.innerHTML = '<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد أرصدة متاحة (الرصيد صفر في جميع الفروع).</p>';
+                        container.innerHTML = `<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">${currentLang === 'ar' ? 'لا توجد أرصدة متاحة في أي فرع.' : 'No available stock in any branch.'}</p>`;
                     }
 
                     playSuccessBeep();
 
                 } else {
-                    detailsTitle.innerHTML = `<i class="fa-solid fa-layer-group text-blue-400"></i> تفاصيل الموديل الرئيسي`;
+                    detailsTitle.innerHTML = `<i class="fa-solid fa-layer-group text-blue-400"></i> ${currentLang === 'ar' ? 'تفاصيل الموديل الرئيسي' : 'Main Model Details'}`;
                     itemCodeBadge.innerText = `Model: ${searchValue}`;
 
                     infoGrid.innerHTML = `
                         <div class="bg-blue-950/70 p-2.5 rounded-xl border border-blue-700/60 shadow-inner col-span-2">
-                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-diagram-project text-blue-400"></i> الموديل / Variant Of</span>
+                            <span class="text-blue-300 block text-[10px] sm:text-[11px] mb-0.5 font-semibold"><i class="fa-solid fa-diagram-project text-blue-400"></i> Variant Of</span>
                             <span class="font-extrabold text-amber-300 text-xs sm:text-sm font-mono">${searchValue}</span>
                         </div>
                     `;
@@ -928,22 +1094,22 @@
                     }
 
                     if (variantData.length > 0) {
-                        let html = `<div class="mb-2.5 flex justify-between items-center"><h4 class="font-bold text-slate-700 text-xs sm:text-sm">الأصناف التابعة للموديل (${variantData.length}):</h4></div>`;
+                        let html = `<div class="mb-2.5 flex justify-between items-center"><h4 class="font-bold text-slate-700 text-xs sm:text-sm">${currentLang === 'ar' ? 'الأصناف التابعة للموديل' : 'Variants of Model'} (${variantData.length}):</h4></div>`;
                         html += `
                         <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
                             <table class="w-full text-xs text-right bg-white">
                                 <thead class="bg-slate-800 text-white whitespace-nowrap">
-                                    <tr><th class="p-2.5">كود المنتج</th><th class="p-2.5">اللون</th><th class="p-2.5">المقاس</th><th class="p-2.5 text-center">الإجراء</th></tr>
+                                    <tr><th class="p-2.5">${currentLang === 'ar' ? 'كود المنتج' : 'Item Code'}</th><th class="p-2.5">${currentLang === 'ar' ? 'اللون' : 'Color'}</th><th class="p-2.5">${currentLang === 'ar' ? 'المقاس' : 'Size'}</th><th class="p-2.5 text-center">${currentLang === 'ar' ? 'الإجراء' : 'Action'}</th></tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">`;
                         
                         variantData.forEach(row => {
                             const itemCode = row.item_code || row.name;
-                            html += `<tr class="hover:bg-indigo-50 transition"><td class="p-2.5 font-bold text-indigo-600 font-mono whitespace-nowrap">${itemCode}</td><td class="p-2.5 font-semibold text-slate-700 whitespace-nowrap">${row.color || '-'}</td><td class="p-2.5 font-semibold text-slate-700 whitespace-nowrap">${row.size || '-'}</td><td class="p-2.5 text-center whitespace-nowrap"><button onclick="selectItemDirectly('${itemCode}')" class="bg-indigo-100 hover:bg-indigo-600 hover:text-white text-indigo-700 px-2.5 py-1 rounded-lg text-[11px] font-bold transition">عرض المخزون <i class="fa-solid fa-arrow-left mr-1"></i></button></td></tr>`;
+                            html += `<tr class="hover:bg-indigo-50 transition"><td class="p-2.5 font-bold text-indigo-600 font-mono whitespace-nowrap">${itemCode}</td><td class="p-2.5 font-semibold text-slate-700 whitespace-nowrap">${row.color || '-'}</td><td class="p-2.5 font-semibold text-slate-700 whitespace-nowrap">${row.size || '-'}</td><td class="p-2.5 text-center whitespace-nowrap"><button onclick="selectItemDirectly('${itemCode}')" class="bg-indigo-100 hover:bg-indigo-600 hover:text-white text-indigo-700 px-2.5 py-1 rounded-lg text-[11px] font-bold transition">${currentLang === 'ar' ? 'عرض المخزون' : 'Check Stock'} <i class="fa-solid fa-arrow-left mx-1"></i></button></td></tr>`;
                         });
                         container.innerHTML = html + `</tbody></table></div>`;
                     } else {
-                        container.innerHTML = '<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لم يتم العثور على أي أصناف تابعة لهذا الموديل.</p>';
+                        container.innerHTML = `<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">${currentLang === 'ar' ? 'لم يتم العثور على أي أصناف تابعة لهذا الموديل.' : 'No variants found for this model.'}</p>`;
                     }
 
                     playSuccessBeep();
@@ -951,7 +1117,7 @@
             } catch (err) {
                 if (err.name === 'AbortError') return;
                 console.error("Stock Error:", err);
-                container.innerHTML = `<div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"><b>تعذر الجلب:</b> ${err.message}.</div>`;
+                container.innerHTML = `<div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"><b>Error:</b> ${err.message}.</div>`;
             }
         }
 
@@ -977,7 +1143,7 @@
             fetchStockData();
         }
 
-        // 2. شاشة المبيعات التفاعلية مع جلب أسماء الموظفين والكميات المباعة
+        // 2. شاشة المبيعات التفاعلية
         async function fetchSalesData() {
             const totalContainer = document.getElementById('sales-total-val');
             const countContainer = document.getElementById('sales-count-val');
@@ -988,14 +1154,14 @@
             const branchInfo = getBranchInfo(savedEmail);
             const branchCode = branchInfo.code;
 
-            branchSubtitle.innerText = `الفرع المخصص: ${branchInfo.name} (كود الفرع: ${branchCode || 'غير محدد'})`;
+            branchSubtitle.innerText = `Assigned Branch: ${branchInfo.name} (Code: ${branchCode || 'N/A'})`;
 
             const fromDate = document.getElementById('sales-from-date').value || new Date().toISOString().split('T')[0];
             const toDate = document.getElementById('sales-to-date').value || new Date().toISOString().split('T')[0];
 
-            totalContainer.innerText = "جاري الحساب...";
+            totalContainer.innerText = currentLang === 'ar' ? "جاري الحساب..." : "Calculating...";
             countContainer.innerText = "...";
-            salesmenContainer.innerHTML = '<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري جلب الفواتير وأسماء الموظفين...</p>';
+            salesmenContainer.innerHTML = `<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>${currentLang === 'ar' ? 'جاري جلب الفواتير...' : 'Fetching branch invoices...'}</p>`;
 
             try {
                 const response = await fetch(`${SERVER_URL}/api/method/get_branch_sales_summary`, {
@@ -1008,7 +1174,7 @@
                     })
                 });
 
-                if (!response.ok) throw new Error(`كود الخطأ: ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
                 const resData = await response.json();
                 const resultMessage = resData.message || { pos: [], sales: [] };
@@ -1025,7 +1191,7 @@
                     let seller = inv.custom_sales_person || inv.sales_partner || inv.owner;
 
                     if (!seller || seller.trim() === "" || seller === "-") {
-                        seller = "غير محدد";
+                        seller = "N/A";
                     }
 
                     const cleanSellerLower = seller.trim().toLowerCase();
@@ -1045,7 +1211,7 @@
                     salesmenMap[seller].qty += (inv.total_qty || 0);
                 });
 
-                totalContainer.innerText = `${validTotalSales.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} SAR`;
+                totalContainer.innerText = `${validTotalSales.toLocaleString('en-US', { minimumFractionDigits: 2 })} SAR`;
                 countContainer.innerText = validInvoicesCount;
 
                 const sortedSalesmen = Object.keys(salesmenMap).map(key => ({
@@ -1061,11 +1227,11 @@
                         <table class="w-full text-xs sm:text-sm text-right bg-white">
                             <thead class="bg-slate-800 text-white whitespace-nowrap">
                                 <tr>
-                                    <th class="p-2.5 text-center w-12">الترتيب</th>
-                                    <th class="p-2.5">اسم الموظف / Salesman</th>
-                                    <th class="p-2.5 text-center">عدد الفواتير</th>
-                                    <th class="p-2.5 text-center">الكميات المباعة</th>
-                                    <th class="p-2.5">إجمالي المبيعات</th>
+                                    <th class="p-2.5 text-center w-12">${currentLang === 'ar' ? 'الترتيب' : 'Rank'}</th>
+                                    <th class="p-2.5">${currentLang === 'ar' ? 'اسم الموظف' : 'Salesman Name'}</th>
+                                    <th class="p-2.5 text-center">${currentLang === 'ar' ? 'عدد الفواتير' : 'Invoices Count'}</th>
+                                    <th class="p-2.5 text-center">${currentLang === 'ar' ? 'الكميات المباعة' : 'Sold Qty'}</th>
+                                    <th class="p-2.5">${currentLang === 'ar' ? 'إجمالي المبيعات' : 'Total Sales'}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -1084,31 +1250,31 @@
                                     <span class="px-2 py-0.5 rounded-lg text-[11px] font-black ${badgeColor}">${icon}</span>
                                 </td>
                                 <td class="p-2.5 font-bold text-slate-800 whitespace-nowrap">
-                                    <i class="fa-solid fa-user-tie text-indigo-500 ml-1"></i> ${sm.name}
+                                    <i class="fa-solid fa-user-tie text-indigo-500 mx-1"></i> ${sm.name}
                                 </td>
                                 <td class="p-2.5 text-center font-semibold text-slate-600 whitespace-nowrap">${sm.count}</td>
-                                <td class="p-2.5 text-center font-bold text-blue-600 whitespace-nowrap">${sm.qty} قطع</td>
-                                <td class="p-2.5 font-extrabold text-emerald-600 whitespace-nowrap">${sm.total.toLocaleString('ar-SA', { minimumFractionDigits: 2 })} SAR</td>
+                                <td class="p-2.5 text-center font-bold text-blue-600 whitespace-nowrap">${sm.qty} ${currentLang === 'ar' ? 'قطع' : 'pcs'}</td>
+                                <td class="p-2.5 font-extrabold text-emerald-600 whitespace-nowrap">${sm.total.toLocaleString('en-US', { minimumFractionDigits: 2 })} SAR</td>
                             </tr>
                         `;
                     });
 
                     salesmenContainer.innerHTML = html + `</tbody></table></div>`;
                 } else {
-                    salesmenContainer.innerHTML = '<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">لا توجد مبيعات مسجلة لبائعي الفرع في هذه الفترة المحددة.</p>';
+                    salesmenContainer.innerHTML = `<p class="text-amber-600 text-xs sm:text-sm font-semibold bg-amber-50 p-3 rounded-xl border border-amber-200">${currentLang === 'ar' ? 'لا توجد مبيعات مسجلة في هذه الفترة.' : 'No sales registered for this period.'}</p>`;
                 }
 
             } catch (err) {
                 if (err.name === 'AbortError') return;
                 console.error("Sales Error:", err);
-                totalContainer.innerText = "خطأ الاتصال";
-                salesmenContainer.innerHTML = `<div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"><b>تعذر جلب البيانات:</b> ${err.message}</div>`;
+                totalContainer.innerText = "Connection Error";
+                salesmenContainer.innerHTML = `<div class="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl"><b>Error:</b> ${err.message}</div>`;
             }
         }
 
         async function fetchTransfersData() {
             const container = document.getElementById('transfers-results');
-            container.innerHTML = '<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري تحميل البيانات...</p>';
+            container.innerHTML = `<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>${currentLang === 'ar' ? 'جاري تحميل البيانات...' : 'Loading transfers...'}</p>`;
 
             try {
                 const response = await fetch(`${SERVER_URL}/api/method/frappe.client.get_list`, {
@@ -1125,7 +1291,7 @@
                     })
                 });
 
-                if (!response.ok) throw new Error(`كود الخطأ: ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
                 const data = await response.json();
                 let entries = data.message || [];
@@ -1136,9 +1302,9 @@
                         <table class="w-full text-xs text-right bg-white">
                             <thead class="bg-slate-800 text-white whitespace-nowrap">
                                 <tr>
-                                    <th class="p-2.5 text-right">رقم الإذن (Voucher No)</th>
-                                    <th class="p-2.5 text-right">من (From)</th>
-                                    <th class="p-2.5 text-right">إلى (To)</th>
+                                    <th class="p-2.5 text-right">Voucher No</th>
+                                    <th class="p-2.5 text-right">From Warehouse</th>
+                                    <th class="p-2.5 text-right">To Warehouse</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">`;
@@ -1152,18 +1318,18 @@
                     });
                     container.innerHTML = html + `</tbody></table></div>`;
                 } else {
-                    container.innerHTML = '<p class="text-slate-500 text-xs sm:text-sm p-2">لا توجد تحويلات معلقة حالياً. / No pending transfers.</p>';
+                    container.innerHTML = `<p class="text-slate-500 text-xs sm:text-sm p-2">${currentLang === 'ar' ? 'لا توجد تحويلات معلقة حالياً.' : 'No pending transfers found.'}</p>`;
                 }
             } catch (err) {
                 if (err.name === 'AbortError') return;
                 console.error("Transfers Error:", err);
-                container.innerHTML = `<p class="text-red-500 text-xs sm:text-sm p-2">فشل جلب البيانات: ${err.message}</p>`;
+                container.innerHTML = `<p class="text-red-500 text-xs sm:text-sm p-2">Failed to fetch: ${err.message}</p>`;
             }
         }
 
         async function fetchRequestsData() {
             const container = document.getElementById('requests-results');
-            container.innerHTML = '<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>جاري تحميل البيانات...</p>';
+            container.innerHTML = `<p class="text-indigo-600 text-xs sm:text-sm animate-pulse"><i class="fa-solid fa-spinner fa-spin ml-2"></i>${currentLang === 'ar' ? 'جاري تحميل الطلبات...' : 'Loading material requests...'}</p>`;
 
             try {
                 const response = await fetch(`${SERVER_URL}/api/method/frappe.client.get_list`, {
@@ -1177,7 +1343,7 @@
                     })
                 });
 
-                if (!response.ok) throw new Error(`كود الخطأ: ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
                 const data = await response.json();
                 let requests = data.message || [];
@@ -1188,9 +1354,9 @@
                         <table class="w-full text-xs text-right bg-white">
                             <thead class="bg-slate-800 text-white whitespace-nowrap">
                                 <tr>
-                                    <th class="p-2.5">رقم الطلب (Request ID)</th>
-                                    <th class="p-2.5">التاريخ (Date)</th>
-                                    <th class="p-2.5">الحالة (Status)</th>
+                                    <th class="p-2.5">Request ID</th>
+                                    <th class="p-2.5">Date</th>
+                                    <th class="p-2.5">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">`;
@@ -1204,12 +1370,12 @@
                     });
                     container.innerHTML = html + `</tbody></table></div>`;
                 } else {
-                    container.innerHTML = '<p class="text-slate-500 text-xs sm:text-sm p-2">لا توجد طلبات مواد حالياً. / No material requests found.</p>';
+                    container.innerHTML = `<p class="text-slate-500 text-xs sm:text-sm p-2">${currentLang === 'ar' ? 'لا توجد طلبات مواد حالياً.' : 'No material requests found.'}</p>`;
                 }
             } catch (err) {
                 if (err.name === 'AbortError') return;
                 console.error("Requests Error:", err);
-                container.innerHTML = `<p class="text-red-500 text-xs sm:text-sm p-2">فشل جلب البيانات: ${err.message}</p>`;
+                container.innerHTML = `<p class="text-red-500 text-xs sm:text-sm p-2">Failed to fetch: ${err.message}</p>`;
             }
         }
     </script>
